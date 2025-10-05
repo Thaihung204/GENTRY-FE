@@ -10,6 +10,7 @@ import { Mail, Lock, User, Shield } from "lucide-react"
 import Link from "next/link"
 import axios from "axios"
 import { useRouter } from "next/navigation"
+import api from "@/app/config/api"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -34,8 +35,8 @@ export default function RegisterPage() {
   }
 
   async function register(data: RegisterRequest): Promise<RegisterResponse> {
-    const res = await axios.post<RegisterResponse>(
-      "https://localhost:5001/api/Auth/register",
+    const res = await api.post<RegisterResponse>(
+      "/auth/register",
       data
     )
     return res.data
