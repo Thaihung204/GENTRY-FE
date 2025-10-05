@@ -23,6 +23,7 @@ import {
 } from "lucide-react"
 import Image from "next/image"
 import axios from "axios"
+import api from "@/app/config/api"
 
 interface WardrobeItem {
   id: number
@@ -153,8 +154,8 @@ export default function WardrobePage() {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get(
-        "https://localhost:5001/api/Categories", {
+      const res = await api.get(
+        "/categories", {
           withCredentials: true
         }
       );
@@ -166,8 +167,8 @@ export default function WardrobePage() {
 
   const fetchColor = async () => {
     try {
-      const res = await axios.get(
-        "https://localhost:5001/api/Colors", {
+      const res = await api.get(
+        "/colors", {
           withCredentials: true
         }
       );
@@ -183,7 +184,7 @@ export default function WardrobePage() {
     try {
       const userId = localStorage.getItem("userId");
       console.log(userId)
-      const res = await axios.get(`https://localhost:5001/api/Items/user/${userId}`, {
+      const res = await api.get(`/items/user/${userId}`, {
         withCredentials: true
       })
 
@@ -242,8 +243,8 @@ export default function WardrobePage() {
       formData.append("ImageFile", file); // key phải trùng với IFormFile
     }
 
-    const res = await axios.post(
-      "https://localhost:5001/api/Items",
+    const res = await api.post(
+      "/items",
       formData,
       {
         withCredentials: true,

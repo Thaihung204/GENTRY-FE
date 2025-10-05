@@ -12,6 +12,7 @@ import Link from "next/link"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/AuthContext"
+import api from "@/app/config/api"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -42,8 +43,8 @@ export default function LoginPage() {
 
   async function login(data: LoginRequest): Promise<LoginResponse> {
     try {
-      const res = await axios.post<LoginResponse>(
-        "https://localhost:5001/api/Auth/login",
+      const res = await api.post<LoginResponse>(
+        "/Auth/login",
         data,
         { withCredentials: true }
       )
@@ -70,7 +71,7 @@ export default function LoginPage() {
 
       if (res.success) {
         // Gọi API lấy profile
-        const profileRes = await axios.get("https://localhost:5001/api/Users/profile", {
+        const profileRes = await api.get("/users/profile", {
           withCredentials: true
         })
 

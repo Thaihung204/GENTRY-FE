@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react"
 import axios from "axios"
+import api from "@/app/config/api"
 
 interface User {
   email: string
@@ -23,7 +24,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchUser = async () => {
     try {
-      const res = await axios.get("https://localhost:5001/api/auth/current-user", {
+      const res = await api.get("/auth/current-user", {
         withCredentials: true,
       })
       if (res.data.success && res.data.data) {
@@ -38,7 +39,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      await axios.post("https://localhost:5001/api/auth/logout", {}, { withCredentials: true })
+      await api.post("/auth/logout", {}, { withCredentials: true })
       setUser(null)
     } catch (err) {
       console.error("Lỗi logout", err)
