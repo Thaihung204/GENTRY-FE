@@ -44,7 +44,7 @@ export default function LoginPage() {
   async function login(data: LoginRequest): Promise<LoginResponse> {
     try {
       const res = await api.post<LoginResponse>(
-        "/Auth/login",
+        "/auth/login",
         data,
         { withCredentials: true }
       )
