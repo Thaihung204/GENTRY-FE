@@ -43,8 +43,8 @@ export default function LoginPage() {
 
   async function login(data: LoginRequest): Promise<LoginResponse> {
     try {
-      const res = await api.post<LoginResponse>(
-        "/auth/login",
+      const res = await axios.post<LoginResponse>(
+        "http://116.105.167.206:8081/api/auth/login",
         data,
         { withCredentials: true }
       )
@@ -71,7 +71,7 @@ export default function LoginPage() {
 
       if (res.success) {
         // Gọi API lấy profile
-        const profileRes = await api.get("/users/profile", {
+        const profileRes = await axios.get("http://116.105.167.206:8081/api/users/profile", {
           withCredentials: true
         })
 
