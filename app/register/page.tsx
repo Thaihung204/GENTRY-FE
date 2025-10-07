@@ -18,15 +18,15 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    fullname: "",
-    confirmpassword: "",
+    confirmPassword: "",
+    fullName: "",
   })
 
   interface RegisterRequest {
     email: string
     password: string
-    fullname: string
-    confirmpassword: string
+    confirmPassword: string
+    fullName: string
   }
 
   interface RegisterResponse {
@@ -37,7 +37,9 @@ export default function RegisterPage() {
   async function register(data: RegisterRequest): Promise<RegisterResponse> {
     const res = await api.post<RegisterResponse>(
       "/auth/register",
-      data
+      data, {
+        headers: { "Content-Type": "application/json" }
+      }
     )
     return res.data
   }
@@ -78,8 +80,8 @@ export default function RegisterPage() {
                   id="fullname"
                   type="text"
                   placeholder="Nguyễn Văn A"
-                  value={formData.fullname}
-                  onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   className="pl-10"
                   required
                 />
@@ -129,8 +131,8 @@ export default function RegisterPage() {
                   id="password"
                   type="password"
                   placeholder="xác nhận mật khẩu"
-                  value={formData.confirmpassword}
-                  onChange={(e) => setFormData({ ...formData, confirmpassword: e.target.value })}
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   className="pl-10"
                   required
                 />
