@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,7 +8,6 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Sparkles, Mail, Lock, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
-import axios from "axios"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/AuthContext"
 import api from "@/app/config/api"
@@ -25,78 +23,57 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const { setUser } = useAuth()
 
-  interface LoginRequest {
-    email: string
-    password: string
-  }
-
   interface LoginResponse {
-  success: boolean
-  message: string
-  data: {
-    id: string
+    success: boolean
+    message: string
     email: string
     fullName: string
     role: string
-  }
-}
-
-  async function login(data: LoginRequest): Promise<LoginResponse> {
-    try {
-      const res = await axios.post<LoginResponse>(
-        "http://116.105.167.206:8081/api/auth/login",
-        data,
-        { withCredentials: true }
-      )
-      return res.data
-    } catch (err: any) {
-      console.error("Axios error:", err.response?.data || err.message)
-      return {
-        success: false,
-        message: err.response?.data?.message || "Lỗi kết nối server",
-        data: {
-          id: "",
-          email: "",
-          fullName: "",
-          role: "",
-        },
-      }
-    }
+    accessToken: string
+    refreshToken: string
+    tokenExpiry?: string
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
     try {
-      const res = await login({ email: formData.email, password: formData.password })
+      const res = await api.post<LoginResponse>("/auth/login", formData, { withCredentials: true })
 
-      if (res.success) {
-        // Gọi API lấy profile
-        const profileRes = await axios.get("http://116.105.167.206:8081/api/users/profile", {
-          withCredentials: true
+      if (res.data.success) {
+        const data = res.data
+
+        localStorage.setItem("accessToken", data.accessToken)
+        localStorage.setItem("refreshToken", data.refreshToken)
+
+        const profileRes = await api.get("/users/profile", {
+          headers: { Authorization: `Bearer ${data.accessToken}` },
         })
 
-        setUser(res.data)
-
-        const userId: string = profileRes.data.data.id
-        const role: string = profileRes.data.data.role
-
-        console.log("Login thành công:", res.data.fullName)
-        console.log("UserId:", userId)
+        const userId = profileRes.data.data.id
+        console.log("----------user ID: ", userId)
+        const role = profileRes.data.data.role
 
         localStorage.setItem("userId", userId)
         localStorage.setItem("role", role)
 
+        setUser({
+          email: data.email,
+          fullName: data.fullName,
+          role: data.role,
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        })
+
         router.push("/homepage")
-        // window.location.reload()
       } else {
-        setError(res.message)
+        setError(res.data.message)
       }
     } catch (err: any) {
       console.error("Login error:", err)
       setError("Đăng nhập thất bại, vui lòng thử lại.")
     }
   }
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">

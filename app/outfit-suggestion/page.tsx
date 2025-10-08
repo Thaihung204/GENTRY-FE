@@ -189,7 +189,7 @@ export default function OutfitSuggestionPage() {
               {generatedOutfits.length === 0 ? (
                 <div className="text-center py-12">
                   <Bot className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">Chọn filter và bấm "Tạo Outfit" để AI phối cho bạn</p>
+                  <p className="text-muted-foreground">Chọn filter và bấm "Tạo Outfit" để AI phối đồ cho bạn</p>
                 </div>
               ) : (
                 generatedOutfits.map((outfit) => (

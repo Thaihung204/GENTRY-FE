@@ -158,6 +158,7 @@ export default function WardrobePage() {
       setFile(null)
       setPreview(null)
       fetchItems()
+      setLoading(false)
     } catch (err: any) {
       console.error("❌ Lỗi khi thêm item:", err.response?.data || err.message)
     }
