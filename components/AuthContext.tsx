@@ -1,13 +1,14 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
-import axios from "axios"
 import api from "@/app/config/api"
 
 interface User {
   email: string
   fullName: string
   role: string
+  accessToken: string
+  refreshToken: string
 }
 
 interface AuthContextType {
@@ -24,11 +25,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchUser = async () => {
     try {
+      const token = localStorage.getItem("accessToken")
+      if (!token) {
+        setUser(null)
+        return
+      }
+
       const res = await api.get("/auth/current-user", {
-        withCredentials: true,
+        headers: { Authorization: `Bearer ${token}` },
       })
+
       if (res.data.success && res.data.data) {
-        setUser(res.data.data)
+        setUser({
+          ...res.data.data,
+          accessToken: token,
+          refreshToken: localStorage.getItem("refreshToken") || "",
+        })
       } else {
         setUser(null)
       }
@@ -40,9 +52,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     try {
       await api.post("/auth/logout", {}, { withCredentials: true })
-      setUser(null)
     } catch (err) {
       console.error("Lỗi logout", err)
+    } finally {
+      localStorage.removeItem("accessToken")
+      localStorage.removeItem("refreshToken")
+      localStorage.removeItem("userId")
+      localStorage.removeItem("role")
+      setUser(null)
     }
   }
 
@@ -59,8 +76,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error("useAuth phải được dùng trong AuthProvider")
-  }
+  if (!context) throw new Error("useAuth phải được dùng trong AuthProvider")
   return context
 }
