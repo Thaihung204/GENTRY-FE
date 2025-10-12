@@ -50,7 +50,7 @@ export default function RegisterPage() {
       .then((res) => {
         if (res.success) {
           alert("Đăng ký thành công!")
-          router.push("/homepage")
+          router.push("/login")
         } else {
           alert("Đăng ký thất bại: " + res.message)
         }

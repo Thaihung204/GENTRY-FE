@@ -25,8 +25,11 @@ export function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-            <Sparkles className="w-6 h-6 text-primary" />
-            GENTRY
+            <img
+              src="/gentry.png"
+              alt="GENTRY Logo"
+              className="w-25 h-25 object-contain"
+            />
           </Link>
 
           {/* Desktop */}
