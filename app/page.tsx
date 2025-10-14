@@ -50,14 +50,16 @@ export default function HomePage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="text-lg px-8">
+                <Button size="lg" className="btn-gentry">
                   <Magic className="w-5 h-5 mr-2" />
                   Dùng thử
                 </Button>
-                <Button variant="outline" size="lg" className="text-lg px-8 bg-transparent">
-                  <Play className="w-5 h-5 mr-2" />
-                  Cách hoạt động
-                </Button>
+                <Link href="/tutorials">
+                  <Button variant="outline" size="lg" className="text-lg px-8 bg-transparent">
+                    <Play className="w-5 h-5 mr-2" />
+                    Cách hoạt động
+                  </Button>
+                </Link>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-6 pt-4">
@@ -151,9 +153,10 @@ export default function HomePage() {
       </section>
 
       {/* Solution Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gradient-to-b from-white via-blue-50 to-blue-100/50 dark:from-navy-950 dark:via-navy-900 dark:to-navy-800">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Text content */}
             <div className="space-y-8">
               <Badge variant="secondary" className="inline-flex items-center gap-2 px-4 py-2">
                 <Magic className="w-4 h-4" />
@@ -163,67 +166,75 @@ export default function HomePage() {
               <h2 className="text-4xl font-bold leading-tight">
                 Outfit hoàn chỉnh
                 <br />
-                chỉ vài giây
+                chỉ trong vài giây
               </h2>
 
               <p className="text-xl text-muted-foreground">
-                AI phân tích dáng, phong cách, tủ đồ để gợi ý outfit hoàn hảo:
+                AI phân tích dáng, phong cách và thời tiết để gợi ý outfit hoàn hảo:
               </p>
 
               <ul className="space-y-4">
-                {["Tủ đồ số hóa", "AI gợi ý outfit", "Mix màu thông minh", "Hợp phong cách & dịp"].map(
+                {["Tủ đồ số hóa", "AI gợi ý outfit", "Mix màu thông minh", "Phù hợp phong cách & dịp"].map(
                   (item, index) => (
                     <li key={index} className="flex items-center gap-3">
-                      <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      <Check className="w-5 h-5 text-emerald-500 flex-shrink-0" />
                       <span className="text-lg">{item}</span>
                     </li>
                   ),
                 )}
               </ul>
 
-              <Button size="lg" className="text-lg px-8">
+              <Button
+                size="lg"
+                className="btn-gentry"
+              >
                 <Rocket className="w-5 h-5 mr-2" />
                 Bắt đầu ngay
               </Button>
+
             </div>
 
+            {/* AI Outfit Preview */}
             <div className="relative">
-              <Card className="p-6 shadow-2xl">
+              <Card className="p-6 shadow-xl rounded-2xl bg-white dark:bg-navy-900 border border-gray-200/20">
                 <CardContent className="space-y-6">
-                  <h4 className="text-xl font-bold text-center">Trang phục Thông minh của Bạn</h4>
+                  <h4 className="text-xl font-bold text-center">Trang phục thông minh của bạn</h4>
 
                   <div className="space-y-4">
-                    <div className="relative rounded-lg overflow-hidden">
+                    {/* Main outfit suggestion image */}
+                    <div className="relative rounded-xl overflow-hidden shadow-md">
                       <Image
                         src="/complete-outfit-suggestion.jpg"
                         alt="Gợi ý outfit"
-                        width={300}
-                        height={200}
-                        className="w-full h-auto"
+                        width={500}
+                        height={350}
+                        className="w-full h-auto object-cover"
                       />
-                      <div className="absolute bottom-2 left-2 right-2 bg-white/90 backdrop-blur-sm rounded px-3 py-1">
-                        <span className="text-sm font-medium">Hoàn hảo cho thời tiết hôm nay</span>
+                      <div className="absolute bottom-2 left-2 right-2 bg-white/80 backdrop-blur-sm rounded-md px-3 py-1 text-sm font-medium text-center">
+                        Hoàn hảo cho thời tiết mát mẻ hôm nay 🌤️
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-4 gap-2">
+                    {/* Individual outfit items */}
+                    <div className="grid grid-cols-4 gap-3">
                       {[
-                        { name: "Áo blazer", image: "blazer jacket" },
-                        { name: "Áo sơ mi", image: "dress shirt" },
-                        { name: "Quần tây", image: "dress pants" },
-                        { name: "Giày", image: "dress shoes" },
+                        { name: "Áo blazer", image: "/aoblazer.png" },
+                        { name: "Áo sơ mi", image: "/aosomi.png" },
+                        { name: "Quần tây", image: "/quantay.png" },
+                        { name: "Giày da", image: "/giayda.png" },
                       ].map((item, index) => (
                         <div key={index} className="text-center space-y-2">
-                          <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                          <div className="aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
                             <Image
-                              src={`/.jpg?height=80&width=80&query=${item.image}`}
+                              src={item.image}
                               alt={item.name}
-                              width={80}
-                              height={80}
-                              className="w-full h-full object-cover"
+                              width={120}
+                              height={120}
+                              className="w-full h-full object-contain scale-105 transition-transform duration-500 hover:scale-110"
                             />
+
                           </div>
-                          <span className="text-xs font-medium">{item.name}</span>
+                          <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{item.name}</span>
                         </div>
                       ))}
                     </div>
@@ -234,6 +245,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
 
       {/* Filters Section */}
       <section className="py-20 bg-muted/50">
@@ -301,64 +313,87 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center space-y-4 mb-12">
-            <h2 className="text-4xl font-bold">Được tin dùng</h2>
-            <p className="text-xl text-muted-foreground">Cộng đồng chia sẻ trải nghiệm phối đồ.</p>
-          </div>
+  <section className="py-20 bg-[var(--muted)]/40">
+    <div className="container mx-auto px-4">
+      <div className="text-center space-y-4 mb-12">
+        <h2 className="text-4xl font-bold text-foreground">Được tin dùng</h2>
+        <p className="text-xl text-muted-foreground">
+          Cộng đồng chia sẻ trải nghiệm phối đồ thực tế cùng GENTRY.
+        </p>
+      </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            {[
-              {
-                name: "Sarah Chen",
-                role: "Quản lý Marketing",
-                text: "Điều này đã hoàn toàn cách mạng hóa thói quen buổi sáng của tôi. Tôi tiết kiệm được rất nhiều thời gian và luôn cảm thấy tự tin với những gì mình đang mặc.",
-              },
-              {
-                name: "David Kim",
-                role: "Lập trình viên",
-                text: "Tôi yêu thích các gợi ý từ AI. Giống như có một stylist cá nhân thực sự hiểu phong cách của tôi.",
-              },
-              {
-                name: "Maria Rodriguez",
-                role: "Giám đốc Sáng tạo",
-                text: "Tủ quần áo của tôi: Tôi không bao giờ phải vội vàng lựa chọn trang phục nữa. Ứng dụng này thực sự giúp tôi sử dụng toàn bộ tủ quần áo một cách hiệu quả.",
-              },
-            ].map((testimonial, index) => (
-              <Card key={index} className="p-6">
-                <CardContent className="space-y-4">
-                  <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground italic">"{testimonial.text}"</p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full"></div>
-                    <div>
-                      <h6 className="font-semibold">{testimonial.name}</h6>
-                      <span className="text-sm text-muted-foreground">{testimonial.role}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+      <div className="grid lg:grid-cols-3 gap-8">
+        {[
+          {
+            name: "Sarah Chen",
+            role: "Quản lý Marketing",
+            text: "Điều này đã hoàn toàn thay đổi thói quen buổi sáng của tôi. Tôi tiết kiệm được rất nhiều thời gian và luôn cảm thấy tự tin với những gì mình mặc.",
+            avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+          },
+          {
+            name: "David Kim",
+            role: "Lập trình viên",
+            text: "Tôi yêu thích các gợi ý từ AI. Giống như có một stylist cá nhân thực sự hiểu phong cách của tôi.",
+            avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+          },
+          {
+            name: "Maria Rodriguez",
+            role: "Giám đốc Sáng tạo",
+            text: "Tôi không bao giờ phải vội vàng chọn trang phục nữa. Ứng dụng này thực sự giúp tôi tận dụng tối đa tủ quần áo của mình.",
+            avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+          },
+        ].map((testimonial, index) => (
+          <Card
+            key={index}
+            className="p-6 border border-[var(--border)] shadow-md hover:shadow-lg transition-all bg-card/80 backdrop-blur-sm"
+          >
+            <CardContent className="space-y-4">
+              <div className="flex gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
 
-          <div className="text-center mt-8">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-              ))}
-            </div>
-            <span className="text-muted-foreground">4.8/5 từ 2,847 đánh giá</span>
-          </div>
+              <p className="text-muted-foreground italic">
+                “{testimonial.text}”
+              </p>
+
+              <div className="flex items-center gap-3 mt-4">
+                <img
+                  src={testimonial.avatar}
+                  alt={testimonial.name}
+                  className="w-12 h-12 rounded-full object-cover border border-[var(--border)]"
+                />
+                <div>
+                  <h6 className="font-semibold text-foreground">
+                    {testimonial.name}
+                  </h6>
+                  <span className="text-sm text-muted-foreground">
+                    {testimonial.role}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="text-center mt-12">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          {[...Array(5)].map((_, i) => (
+            <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+          ))}
         </div>
-      </section>
+        <span className="text-muted-foreground">
+          4.8/5 từ <span className="font-semibold text-foreground">2,847</span> đánh giá
+        </span>
+      </div>
+    </div>
+  </section>
+
 
       {/* Footer */}
-      <footer className="bg-background border-t py-12">
+      <footer className="bg-[var(--footer-bg)] text-[var(--footer-text)] border-t border-[var(--footer-border)] py-12">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-5 gap-8">
             <div className="lg:col-span-2 space-y-4">
@@ -366,7 +401,7 @@ export default function HomePage() {
                 <Sparkles className="w-6 h-6 text-primary" />
                 <span className="text-2xl font-bold">GENTRY</span>
               </div>
-              <p className="text-muted-foreground max-w-md">Biến tủ đồ của bạn thành thông minh, hợp gu.</p>
+              <p className="text-[var(--footer-text)]/80 max-w-md">Biến tủ đồ của bạn thành thông minh, hợp gu.</p>
               <div className="flex gap-4">
                 <Button variant="ghost" size="icon">
                   <Facebook className="w-5 h-5" />
@@ -385,7 +420,7 @@ export default function HomePage() {
 
             <div className="space-y-4">
               <h6 className="font-semibold">Sản phẩm</h6>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <ul className="space-y-2 text-sm text-[var(--footer-text)]/80">
                 <li>
                   <Link href="/ai-styling" className="hover:text-foreground">
                     AI Styling
@@ -411,7 +446,7 @@ export default function HomePage() {
 
             <div className="space-y-4">
               <h6 className="font-semibold">Công ty</h6>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <ul className="space-y-2 text-sm text-[var(--footer-text)]/80">
                 <li>
                   <Link href="#" className="hover:text-foreground">
                     Về chúng tôi
@@ -437,7 +472,7 @@ export default function HomePage() {
 
             <div className="space-y-4">
               <h6 className="font-semibold">Hỗ trợ</h6>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <ul className="space-y-2 text-sm text-[var(--footer-text)]/80">
                 <li>
                   <Link href="#" className="hover:text-foreground">
                     Trung tâm Hỗ trợ
@@ -463,8 +498,8 @@ export default function HomePage() {
           </div>
 
           <div className="border-t mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground">© 2025 GENTRY. Tất cả quyền được bảo lưu.</p>
-            <p className="text-sm text-muted-foreground flex items-center gap-1">
+            <p className="text-sm text-[var(--footer-text)]/80">© 2025 GENTRY. Tất cả quyền được bảo lưu.</p>
+            <p className="text-sm text-[var(--footer-text)]/80 flex items-center gap-1">
               Được tạo với <Heart className="w-4 h-4 text-red-500 fill-current" /> cho Thời trang
             </p>
           </div>

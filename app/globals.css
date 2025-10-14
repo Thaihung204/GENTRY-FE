@@ -57,6 +57,11 @@
   --sidebar-accent-foreground: oklch(0.15 0 0);
   --sidebar-border: oklch(0.88 0.01 240);
   --sidebar-ring: oklch(0.42 0.14 260);
+
+  /* === Footer === */
+  --footer-bg: oklch(0.15 0.03 260); /* navy đậm gần đen */
+  --footer-text: oklch(0.95 0.01 260); /* trắng nhẹ */
+  --footer-border: oklch(0.25 0.02 260); /* viền xanh xám nhẹ */
 }
 
 .dark {
@@ -103,6 +108,11 @@
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(0.25 0.02 250);
   --sidebar-ring: oklch(0.42 0.14 260);
+
+  /* === Footer Dark Mode === */
+  --footer-bg: oklch(0.1 0.02 260); /* gần đen navy */
+  --footer-text: oklch(0.92 0.01 260);
+  --footer-border: oklch(0.22 0.02 260);
 }
 
 /* Tailwind mapping giữ nguyên */
@@ -139,6 +149,13 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 }
+
+.btn-gentry {
+  @apply text-white bg-gradient-to-r from-[#0b132b] to-[#1e3a8a] 
+         hover:from-[#1e3a8a] hover:to-[#2563eb] 
+         shadow-md transition-transform hover:scale-105;
+}
+
 
 @layer base {
   * {

@@ -44,10 +44,10 @@ export default function OutfitSuggestionPage() {
         id: 1,
         name: "Outfit Công sở",
         items: [
-          { name: "Áo blazer", image: "business blazer" },
-          { name: "Áo sơ mi", image: "white dress shirt" },
-          { name: "Quần tây", image: "dress pants" },
-          { name: "Giày oxford", image: "oxford shoes" },
+          { name: "Áo blazer", image: "/aoblazer.png" },
+          { name: "Áo sơ mi", image: "/aosomi.png" },
+          { name: "Quần tây", image: "/quantay.png" },
+          { name: "Giày oxford", image: "/giayda.png" },
         ],
         confidence: 95,
         occasion: "Công sở",
@@ -123,7 +123,7 @@ export default function OutfitSuggestionPage() {
                   {weatherOptions.map((weather) => (
                     <Button
                       key={weather.id}
-                      variant={selectedWeather === weather.id ? "default" : "outline"}
+                      variant={selectedWeather === weather.id ? "gentry" : "outline"}
                       size="sm"
                       onClick={() => setSelectedWeather(weather.id)}
                     >
@@ -141,7 +141,7 @@ export default function OutfitSuggestionPage() {
                   {colors.map((color) => (
                     <Button
                       key={color.id}
-                      variant="outline"
+                      variant="gentry"
                       size="sm"
                       className="w-10 h-10 rounded-full border-2"
                       style={{
@@ -161,7 +161,7 @@ export default function OutfitSuggestionPage() {
               </div>
 
               {/* Nút tạo */}
-              <Button className="w-full" size="lg" onClick={generateOutfit} disabled={isGenerating}>
+              <Button className="w-full" size="lg" onClick={generateOutfit} disabled={isGenerating} variant="gentry">
                 {isGenerating ? (
                   <>
                     <Bot className="w-5 h-5 mr-2 animate-spin" />
@@ -203,7 +203,7 @@ export default function OutfitSuggestionPage() {
                         {outfit.items.map((item: any, idx: number) => (
                           <div key={idx} className="text-center space-y-1">
                             <Image
-                              src={`/.jpg?height=80&width=80&query=${item.image}`}
+                              src={item.image}
                               alt={item.name}
                               width={80}
                               height={80}
