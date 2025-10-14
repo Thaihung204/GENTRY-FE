@@ -63,6 +63,15 @@ interface ItemDTO {
   modifiedDate?: string
 }
 
+interface Style {
+  styleId: number
+  name: string
+  description: string
+  imageFileId: number
+  tags: string
+  isActive: boolean
+}
+
 export default function WardrobePage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [searchQuery, setSearchQuery] = useState("")
@@ -80,6 +89,7 @@ export default function WardrobePage() {
   const [colors, setColors] = useState<Color[]>([])
   const [wardrobeItems, setWardrobeItems] = useState<ItemDTO[]>([])
   const [loading, setLoading] = useState(true)
+  const [styles, setStyles] = useState<Style[]>([])
 
   const fetchCategories = async () => {
     try {
@@ -111,10 +121,20 @@ export default function WardrobePage() {
     }
   }
 
+  const fetchStyles = async () => {
+    try {
+      const res = await api.get("/styles", { withCredentials: true }) 
+      setStyles(res.data)
+    } catch (err) {
+      console.error("Error fetching styles:", err)
+    }
+  }
+
   useEffect(() => {
     fetchCategories()
     fetchColor()
     fetchItems()
+    fetchStyles()
   }, [])
 
   const filteredItems = wardrobeItems.filter((item) => {
@@ -216,14 +236,14 @@ export default function WardrobePage() {
           <div className="flex items-center gap-3">
             <div className="flex border rounded-lg">
               <Button
-                variant={viewMode === "grid" ? "default" : "ghost"}
+                variant={viewMode === "grid" ? "gentry" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("grid")}
               >
                 <Grid3X3 className="w-4 h-4" />
               </Button>
               <Button
-                variant={viewMode === "list" ? "default" : "ghost"}
+                variant={viewMode === "list" ? "gentry" : "ghost"}
                 size="sm"
                 onClick={() => setViewMode("list")}
               >
@@ -234,7 +254,7 @@ export default function WardrobePage() {
             {/* Add Item Dialog */}
             <Dialog open={addItemModalOpen} onOpenChange={setAddItemModalOpen}>
               <DialogTrigger asChild>
-                <Button>
+                <Button variant="gentry">
                   <Plus className="w-4 h-4 mr-2" />
                   Thêm Trang Phục
                 </Button>
@@ -254,7 +274,7 @@ export default function WardrobePage() {
                       className="hidden"
                       onChange={handleFileChange}
                     />
-                    <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+                    <Button variant="gentry" size="sm" onClick={() => fileInputRef.current?.click()}>
                       Chọn ảnh
                     </Button>
                     {preview && (
@@ -311,7 +331,18 @@ export default function WardrobePage() {
                     </div>
                     <div>
                       <Label>Tags</Label>
-                      <Input value={itemTags} onChange={(e) => setItemTags(e.target.value)} />
+                      <Select onValueChange={setItemTags}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Chọn phong cách" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {styles.map((style) => (
+                            <SelectItem key={style.styleId} value={style.name}>
+                              {style.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </div>
@@ -319,7 +350,7 @@ export default function WardrobePage() {
                   <Button variant="outline" onClick={() => setAddItemModalOpen(false)}>
                     Hủy
                   </Button>
-                  <Button onClick={handleAddItem}>Thêm</Button>
+                  <Button onClick={handleAddItem} variant="gentry">Thêm</Button>
                 </div>
               </DialogContent>
             </Dialog>

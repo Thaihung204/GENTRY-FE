@@ -42,10 +42,18 @@ export function Navigation() {
             {user ? (
               <div className="flex items-center gap-4">
                 <span className="text-sm">Xin chào, {user.fullName}</span>
-                <Button onClick={logout}>Đăng xuất</Button>
+                <Button
+                  onClick={logout}
+                  className="btn-gentry"
+                >
+                  Đăng xuất
+                </Button>
               </div>
             ) : (
-              <Button asChild>
+              <Button
+                asChild
+                className="btn-gentry"
+              >
                 <Link href="/login">Đăng nhập</Link>
               </Button>
             )}
@@ -73,12 +81,18 @@ export function Navigation() {
                 {user ? (
                   <>
                     <span className="text-sm">Xin chào, {user.fullName}</span>
-                    <Button onClick={logout} className="mt-4">
+                    <Button
+                      onClick={logout}
+                      className="btn-gentry"
+                    >
                       Đăng xuất
                     </Button>
                   </>
                 ) : (
-                  <Button asChild className="mt-4">
+                  <Button
+                    asChild
+                    className="btn-gentry"
+                  >
                     <Link href="/login">Đăng nhập</Link>
                   </Button>
                 )}

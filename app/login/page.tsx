@@ -66,7 +66,7 @@
             refreshToken: data.refreshToken,
           })
 
-          router.push("/homepage")
+          router.push("/")
         } else {
           setError(res.data.message)
         }

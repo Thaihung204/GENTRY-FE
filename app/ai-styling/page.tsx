@@ -163,7 +163,7 @@ export default function AIStylingPage() {
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && !isLoading && handleSend()}
             />
-            <Button onClick={handleSend} disabled={isLoading}>
+            <Button onClick={handleSend} disabled={isLoading} variant="gentry">
               {isLoading ? "..." : <Send className="w-4 h-4" />}
             </Button>
           </div>
