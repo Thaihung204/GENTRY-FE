@@ -50,11 +50,11 @@ export default function CommunityPage() {
       id: 1,
       user: {
         name: "Minh Anh",
-        avatar: "young woman with stylish outfit",
+        avatar: "/a.png",
         isFollowing: false,
       },
       timeAgo: "2 giờ trước",
-      image: "casual street style outfit",
+      image: "/d.png",
       description:
         "Outfit hôm nay với phong cách street casual 🌟 Mix áo thun trắng với quần jeans và sneakers yêu thích!",
       tags: ["Casual", "Street Style", "Hàng Ngày"],
@@ -68,11 +68,11 @@ export default function CommunityPage() {
       id: 2,
       user: {
         name: "Thu Hà",
-        avatar: "professional woman in business attire",
+        avatar: "/b.png",
         isFollowing: true,
       },
       timeAgo: "5 giờ trước",
-      image: "business formal outfit",
+      image: "/e.png",
       description: "Look công sở thanh lịch với blazer và quần âu. Perfect cho những cuộc họp quan trọng! 💼",
       tags: ["Formal", "Công Sở", "Thanh Lịch"],
       likes: 389,
@@ -85,11 +85,11 @@ export default function CommunityPage() {
       id: 3,
       user: {
         name: "Đức Minh",
-        avatar: "young man in vintage style",
+        avatar: "/c.png",
         isFollowing: false,
       },
       timeAgo: "1 ngày trước",
-      image: "vintage retro outfit",
+      image: "/f.png",
       description: "Thử nghiệm phong cách vintage với áo sơ mi kẻ và quần suspender. Retro vibes! ✨",
       tags: ["Vintage", "Retro", "Độc Đáo"],
       likes: 156,
@@ -304,7 +304,7 @@ export default function CommunityPage() {
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-400">
                         <Image
-                          src={`/.jpg?height=40&width=40&query=${post.user.avatar}`}
+                          src={post.user.avatar}
                           alt={post.user.name}
                           width={40}
                           height={40}
@@ -328,20 +328,27 @@ export default function CommunityPage() {
 
                 <CardContent className="p-0">
                   {/* Post Image */}
-                  <div className="relative group">
+                  <div className="relative group overflow-hidden rounded-b-lg bg-white">
                     <Image
-                      src={`/.jpg?height=300&width=300&query=${post.image}`}
+                      src={post.image}
                       alt="Outfit"
-                      width={300}
-                      height={300}
-                      className="w-full aspect-square object-cover"
+                      width={600}
+                      height={800}
+                      className="w-full h-[480px] object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      style={{ objectPosition: "center top" }}
                     />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <Button variant="secondary" size="sm">
+
+                    {/* Overlay khi hover */}
+                    {/* <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="backdrop-blur-sm text-white bg-white/20 hover:bg-white/30"
+                      >
                         <Eye className="w-4 h-4 mr-2" />
                         Xem Chi Tiết
                       </Button>
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Post Content */}

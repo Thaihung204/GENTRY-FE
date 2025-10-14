@@ -62,31 +62,50 @@ export default function ContactPage() {
   }
 
   const teamMembers = [
-    {
-      name: "Nguyễn Minh Anh",
-      role: "CEO & Founder",
-      description: "10+ năm kinh nghiệm trong ngành công nghệ và thời trang. Chuyên gia AI và Machine Learning.",
-      image: "professional CEO woman in business suit",
-    },
-    {
-      name: "Trần Thị Linh",
-      role: "Head of Design",
-      description: "Chuyên gia UX/UI với niềm đam mê tạo ra những trải nghiệm người dùng tuyệt vời trong thời trang.",
-      image: "creative designer woman with artistic background",
-    },
-    {
-      name: "Lê Hoàng Nam",
-      role: "CTO",
-      description: "Kỹ sư phần mềm hàng đầu, chuyên phát triển các giải pháp AI và hệ thống backend mạnh mẽ.",
-      image: "tech professional man with modern office background",
-    },
-    {
-      name: "Phạm Thị Hương",
-      role: "Customer Success",
-      description: "Chuyên gia chăm sóc khách hàng với sứ mệnh mang đến trải nghiệm dịch vụ hoàn hảo nhất.",
-      image: "customer service professional woman smiling",
-    },
-  ]
+        {
+          name: "Đỗ Trọng Nguyên Bảo",
+          role: "Founder & CEO",
+          description:
+            "Nhà sáng lập và định hướng chiến lược phát triển của GENTRY. Dẫn dắt đội ngũ kết hợp công nghệ AI với phong cách thời trang hiện đại.",
+          image: "professional marketing manager smiling with city office background",
+        },
+        {
+          name: "Phạm Đăng Phát",
+          role: "Frontend Developer",
+          description:
+            "Phụ trách xây dựng và tối ưu giao diện người dùng. Mang đến trải nghiệm mượt mà và thẩm mỹ cho nền tảng GENTRY.",
+          image: "phat.png",
+        },
+        {
+          name: "Lê Tấn Đại",
+          role: "AI Engineer",
+          description:
+            "Chuyên gia trí tuệ nhân tạo, phát triển các mô hình gợi ý outfit và phân tích xu hướng thời trang thông minh.",
+          image: "dai.png",
+        },
+        {
+          name: "Huỳnh Bá Thái Hùng",
+          role: "Backend Developer",
+          description:
+            "Đảm nhiệm phát triển hệ thống máy chủ, API và quản lý cơ sở dữ liệu. Đảm bảo nền tảng GENTRY vận hành ổn định, an toàn.",
+          image: "thaihung.jpg",
+        },
+        {
+          name: "Nguyễn Võ Bảo Long",
+          role: "Marketing Manager",
+          description:
+            "Chịu trách nhiệm phát triển thương hiệu và chiến lược truyền thông, lan tỏa hình ảnh GENTRY đến cộng đồng người dùng yêu thời trang.",
+          image: "long.png",
+        },
+        {
+          name: "Nguyễn Đức Anh",
+          role: "UI/UX Designer",
+          description:
+            "Thiết kế giao diện và trải nghiệm người dùng với phong cách tinh tế, hiện đại, phản ánh cá tính của thương hiệu GENTRY.",
+          image: "anh.png",
+        },
+      ]
+
 
   const contactMethods = [
     {
@@ -101,7 +120,7 @@ export default function ContactPage() {
       icon: Mail,
       title: "Email",
       description: "Gửi email chi tiết về vấn đề của bạn",
-      contact: "support@gentry.vn",
+      contact: "gentryoutfits1@gmail.com",
       availability: "Phản hồi trong 2 giờ",
       href: "mailto:support@gentry.vn",
     },
@@ -202,27 +221,33 @@ export default function ContactPage() {
       <section className="py-12 bg-white/50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Đội Ngũ GENTRY</h2>
+            <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Đội Ngũ GENTRY
+            </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Gặp gỡ những con người đứng sau thành công của GENTRY AI Fashion
+              Gặp gỡ những người kiến tạo nên GENTRY AI Fashion – sự hòa quyện giữa công nghệ và phong cách.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
             {teamMembers.map((member, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow">
+              <Card
+                key={index}
+                className="text-center hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden border border-blue-100 hover:border-blue-300 bg-white"
+              >
                 <CardContent className="p-6 space-y-4">
-                  <div className="w-24 h-24 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-400">
+                  <div className="relative mx-auto w-28 h-28 rounded-full overflow-hidden ring-2 ring-offset-2 ring-blue-400 group">
                     <Image
-                      src={`/.jpg?height=96&width=96&query=${member.image}`}
+                      src={member.image}
                       alt={member.name}
-                      width={96}
-                      height={96}
-                      className="w-full h-full object-cover"
+                      width={112}
+                      height={112}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <h5 className="font-bold">{member.name}</h5>
+                    <h5 className="font-bold text-lg">{member.name}</h5>
                     <p className="text-primary font-medium">{member.role}</p>
                     <p className="text-sm text-muted-foreground">{member.description}</p>
                   </div>
@@ -389,7 +414,7 @@ export default function ContactPage() {
                   <MapPin className="w-6 h-6 text-primary mt-1" />
                   <div>
                     <h6 className="font-semibold mb-1">Địa chỉ</h6>
-                    <p className="text-muted-foreground">123 Nguyễn Huệ, Quận 1, TP.HCM</p>
+                    <p className="text-muted-foreground">Chung cư Sunhome, Đà Nẵng, Việt Nam</p>
                   </div>
                 </div>
 
