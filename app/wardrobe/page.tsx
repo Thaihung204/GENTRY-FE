@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label"
 import {
   Plus,
   Search,
-  Filter,
   Grid3X3,
   List,
   CloudUpload,
@@ -19,6 +18,8 @@ import {
   TrendingUp,
   BarChart3,
   Sparkles,
+  Trash2,
+  Info,
 } from "lucide-react"
 import Image from "next/image"
 import api from "@/app/config/api"
@@ -90,6 +91,8 @@ export default function WardrobePage() {
   const [wardrobeItems, setWardrobeItems] = useState<ItemDTO[]>([])
   const [loading, setLoading] = useState(true)
   const [styles, setStyles] = useState<Style[]>([])
+  const [selectedItem, setSelectedItem] = useState<ItemDTO | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
 
   const fetchCategories = async () => {
     try {
@@ -123,7 +126,7 @@ export default function WardrobePage() {
 
   const fetchStyles = async () => {
     try {
-      const res = await api.get("/styles", { withCredentials: true }) 
+      const res = await api.get("/styles", { withCredentials: true })
       setStyles(res.data)
     } catch (err) {
       console.error("Error fetching styles:", err)
@@ -168,7 +171,6 @@ export default function WardrobePage() {
         headers: { "Content-Type": "multipart/form-data" },
       })
 
-      console.log("✅ Thêm thành công:", res.data)
       setAddItemModalOpen(false)
       setItemName("")
       setItemCategory("")
@@ -178,7 +180,6 @@ export default function WardrobePage() {
       setFile(null)
       setPreview(null)
       fetchItems()
-      setLoading(false)
     } catch (err: any) {
       console.error("❌ Lỗi khi thêm item:", err.response?.data || err.message)
     }
@@ -189,6 +190,16 @@ export default function WardrobePage() {
     if (selectedFile) {
       setFile(selectedFile)
       setPreview(URL.createObjectURL(selectedFile))
+    }
+  }
+
+  const handleDeleteItem = async (id: string) => {
+    try {
+      await api.delete(`/items/${id}`, { withCredentials: true })
+      setWardrobeItems((prev) => prev.filter((i) => i.id !== id))
+      setDetailOpen(false)
+    } catch (err) {
+      console.error("❌ Lỗi khi xóa item:", err)
     }
   }
 
@@ -223,7 +234,8 @@ export default function WardrobePage() {
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Danh mục" />
               </SelectTrigger>
-              <SelectContent>
+              {/* 👇 Dropdown fixed alignment */}
+              <SelectContent align="start">
                 {categories.map((category) => (
                   <SelectItem key={category.categoryId} value={category.name}>
                     {category.name}
@@ -295,7 +307,7 @@ export default function WardrobePage() {
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn danh mục" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent align="start">
                           {categories.map((cat) => (
                             <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>
                               {cat.name}
@@ -310,7 +322,7 @@ export default function WardrobePage() {
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn màu" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent align="start">
                           {colors.map((c) => (
                             <SelectItem key={c.id} value={c.id.toString()}>
                               <div className="flex items-center gap-2">
@@ -335,7 +347,7 @@ export default function WardrobePage() {
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn phong cách" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent align="start">
                           {styles.map((style) => (
                             <SelectItem key={style.styleId} value={style.name}>
                               {style.name}
@@ -358,11 +370,16 @@ export default function WardrobePage() {
         </div>
 
         {/* Wardrobe Items */}
-        <div
-          className={viewMode === "grid" ? "grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-6" : "space-y-4"}
-        >
+        <div className={viewMode === "grid" ? "grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-6" : "space-y-4"}>
           {filteredItems.map((item) => (
-            <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <Card
+              key={item.id}
+              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => {
+                setSelectedItem(item)
+                setDetailOpen(true)
+              }}
+            >
               {viewMode === "grid" ? (
                 <>
                   <Image
@@ -404,6 +421,42 @@ export default function WardrobePage() {
             </Card>
           ))}
         </div>
+
+        {/* Detail Dialog */}
+        <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+          <DialogContent className="max-w-xl">
+            {selectedItem && (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Info className="w-5 h-5" /> {selectedItem.name}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col md:flex-row gap-6">
+                  <Image
+                    src={selectedItem.fileUrl || "/placeholder.jpg"}
+                    alt={selectedItem.name}
+                    width={240}
+                    height={240}
+                    className="rounded object-cover"
+                  />
+                  <div className="space-y-3 text-sm">
+                    <p><strong>Thương hiệu:</strong> {selectedItem.brand || "—"}</p>
+                    <p><strong>Danh mục:</strong> {selectedItem.categoryName || "—"}</p>
+                    <p><strong>Màu sắc:</strong> {selectedItem.colorName || "—"}</p>
+                    <p><strong>Phong cách:</strong> {selectedItem.tags || "—"}</p>
+                    <p><strong>Ngày tạo:</strong> {new Date(selectedItem.createdDate).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                <div className="flex justify-end mt-6">
+                  <Button variant="destructive" onClick={() => handleDeleteItem(selectedItem.id)}>
+                    <Trash2 className="w-4 h-4 mr-2" /> Xóa Trang Phục
+                  </Button>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Analytics Section */}
         <div className="grid lg:grid-cols-3 gap-6 mt-10">
