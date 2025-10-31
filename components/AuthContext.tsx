@@ -23,6 +23,25 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
 
+  // ✅ 1. Load user từ localStorage khi khởi tạo
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user")
+    if (storedUser) {
+      setUser(JSON.parse(storedUser))
+    } else {
+      fetchUser() // fallback: gọi API nếu chưa có
+    }
+  }, [])
+
+  // ✅ 2. Lưu user vào localStorage mỗi khi thay đổi
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user))
+    } else {
+      localStorage.removeItem("user")
+    }
+  }, [user])
+
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem("accessToken")
@@ -36,16 +55,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       })
 
       if (res.data.success && res.data.data) {
-        setUser({
+        const userData: User = {
           ...res.data.data,
           accessToken: token,
           refreshToken: localStorage.getItem("refreshToken") || "",
-        })
+        }
+        setUser(userData)
+
+        // ✅ Lưu vào localStorage để giữ trạng thái khi refresh
+        localStorage.setItem("user", JSON.stringify(userData))
       } else {
         setUser(null)
+        localStorage.removeItem("user")
       }
-    } catch {
+    } catch (err) {
+      console.error("Lỗi fetchUser:", err)
       setUser(null)
+      localStorage.removeItem("user")
     }
   }
 
@@ -53,19 +79,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await api.post("/auth/logout", {}, { withCredentials: true })
     } catch (err) {
-      console.error("Lỗi logout", err)
+      console.error("Lỗi logout:", err)
     } finally {
       localStorage.removeItem("accessToken")
       localStorage.removeItem("refreshToken")
       localStorage.removeItem("userId")
       localStorage.removeItem("role")
+      localStorage.removeItem("user")
       setUser(null)
     }
   }
-
-  useEffect(() => {
-    fetchUser()
-  }, [])
 
   return (
     <AuthContext.Provider value={{ user, setUser, fetchUser, logout }}>

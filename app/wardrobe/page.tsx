@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label"
 import {
   Plus,
   Search,
-  Filter,
   Grid3X3,
   List,
   CloudUpload,
@@ -19,9 +18,16 @@ import {
   TrendingUp,
   BarChart3,
   Sparkles,
+  Trash2,
+  Info,
+  Send
 } from "lucide-react"
 import Image from "next/image"
 import api from "@/app/config/api"
+import axios from "axios"
+import { motion, AnimatePresence } from "framer-motion"
+import { X, MessageCircle } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface Category {
   categoryId: number
@@ -90,6 +96,19 @@ export default function WardrobePage() {
   const [wardrobeItems, setWardrobeItems] = useState<ItemDTO[]>([])
   const [loading, setLoading] = useState(true)
   const [styles, setStyles] = useState<Style[]>([])
+  const [selectedItem, setSelectedItem] = useState<ItemDTO | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [message, setMessage] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [chatHistory, setChatHistory] = useState<
+    {
+      sender: "user" | "ai"
+      text: string
+      imageUrl?: string
+      outfitItems?: any[]
+    }[]
+  >([])
+  const [isChatOpen, setIsChatOpen] = useState(false)
 
   const fetchCategories = async () => {
     try {
@@ -123,7 +142,7 @@ export default function WardrobePage() {
 
   const fetchStyles = async () => {
     try {
-      const res = await api.get("/styles", { withCredentials: true }) 
+      const res = await api.get("/styles", { withCredentials: true })
       setStyles(res.data)
     } catch (err) {
       console.error("Error fetching styles:", err)
@@ -168,7 +187,6 @@ export default function WardrobePage() {
         headers: { "Content-Type": "multipart/form-data" },
       })
 
-      console.log("✅ Thêm thành công:", res.data)
       setAddItemModalOpen(false)
       setItemName("")
       setItemCategory("")
@@ -178,7 +196,6 @@ export default function WardrobePage() {
       setFile(null)
       setPreview(null)
       fetchItems()
-      setLoading(false)
     } catch (err: any) {
       console.error("❌ Lỗi khi thêm item:", err.response?.data || err.message)
     }
@@ -189,6 +206,70 @@ export default function WardrobePage() {
     if (selectedFile) {
       setFile(selectedFile)
       setPreview(URL.createObjectURL(selectedFile))
+    }
+  }
+
+  const handleDeleteItem = async (id: string) => {
+    try {
+      await api.delete(`/items/${id}`, { withCredentials: true })
+      setWardrobeItems((prev) => prev.filter((i) => i.id !== id))
+      setDetailOpen(false)
+    } catch (err) {
+      console.error("❌ Lỗi khi xóa item:", err)
+    }
+  }
+
+  const handleSend = async () => {
+    if (!message.trim()) return
+    setIsLoading(true)
+
+    // 🧍‍♂️ Thêm tin nhắn người dùng vào UI
+    setChatHistory(prev => [...prev, { sender: "user", text: message }])
+
+    try {
+      const response = await api.post("/outfitai/chat/gemini", {
+        userId: "fd929ff5-0b2c-4ff2-b372-caee3974196a",
+        userMessage: message,
+        occasion: "holiday",
+        weatherCondition: "sunny",
+        season: "spring",
+        additionalPreferences: "cloudy",
+      })
+
+      const data = response.data
+
+      if (data.success) {
+        setChatHistory(prev => [
+          ...prev,
+          {
+            sender: "ai",
+            text: `${data.message}\n\n${data.recommendationReason || ""}`,
+            imageUrl: data.imageUrl,
+            outfitItems: Array.isArray(data.outfitItems) ? data.outfitItems : [],
+          },
+        ])
+      } else {
+        setChatHistory(prev => [
+          ...prev,
+          { sender: "ai", text: data.message || "AI không thể tạo outfit ngay lúc này." },
+        ])
+      }
+    } catch (error: any) {
+      console.error("❌ Lỗi khi gọi API:", error)
+
+      // Nếu server trả về lỗi HTTP
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status
+        const msg =
+          error.response?.data?.message ||
+          (status ? `Lỗi máy chủ (${status})` : "Không thể kết nối đến máy chủ.")
+        setChatHistory(prev => [...prev, { sender: "ai", text: msg }])
+      } else {
+        setChatHistory(prev => [
+          ...prev,
+          { sender: "ai", text: "Đã xảy ra lỗi không xác định khi kết nối đến AI." },
+        ])
+      }
     }
   }
 
@@ -223,7 +304,8 @@ export default function WardrobePage() {
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Danh mục" />
               </SelectTrigger>
-              <SelectContent>
+              {/* 👇 Dropdown fixed alignment */}
+              <SelectContent align="start">
                 {categories.map((category) => (
                   <SelectItem key={category.categoryId} value={category.name}>
                     {category.name}
@@ -295,7 +377,7 @@ export default function WardrobePage() {
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn danh mục" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent align="start">
                           {categories.map((cat) => (
                             <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>
                               {cat.name}
@@ -310,7 +392,7 @@ export default function WardrobePage() {
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn màu" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent align="start">
                           {colors.map((c) => (
                             <SelectItem key={c.id} value={c.id.toString()}>
                               <div className="flex items-center gap-2">
@@ -335,7 +417,7 @@ export default function WardrobePage() {
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn phong cách" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent align="start">
                           {styles.map((style) => (
                             <SelectItem key={style.styleId} value={style.name}>
                               {style.name}
@@ -358,11 +440,16 @@ export default function WardrobePage() {
         </div>
 
         {/* Wardrobe Items */}
-        <div
-          className={viewMode === "grid" ? "grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-6" : "space-y-4"}
-        >
+        <div className={viewMode === "grid" ? "grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-6" : "space-y-4"}>
           {filteredItems.map((item) => (
-            <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <Card
+              key={item.id}
+              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => {
+                setSelectedItem(item)
+                setDetailOpen(true)
+              }}
+            >
               {viewMode === "grid" ? (
                 <>
                   <Image
@@ -404,6 +491,42 @@ export default function WardrobePage() {
             </Card>
           ))}
         </div>
+
+        {/* Detail Dialog */}
+        <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+          <DialogContent className="max-w-xl">
+            {selectedItem && (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Info className="w-5 h-5" /> {selectedItem.name}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col md:flex-row gap-6">
+                  <Image
+                    src={selectedItem.fileUrl || "/placeholder.jpg"}
+                    alt={selectedItem.name}
+                    width={240}
+                    height={240}
+                    className="rounded object-cover"
+                  />
+                  <div className="space-y-3 text-sm">
+                    <p><strong>Thương hiệu:</strong> {selectedItem.brand || "—"}</p>
+                    <p><strong>Danh mục:</strong> {selectedItem.categoryName || "—"}</p>
+                    <p><strong>Màu sắc:</strong> {selectedItem.colorName || "—"}</p>
+                    <p><strong>Phong cách:</strong> {selectedItem.tags || "—"}</p>
+                    <p><strong>Ngày tạo:</strong> {new Date(selectedItem.createdDate).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                <div className="flex justify-end mt-6">
+                  <Button variant="destructive" onClick={() => handleDeleteItem(selectedItem.id)}>
+                    <Trash2 className="w-4 h-4 mr-2" /> Xóa Trang Phục
+                  </Button>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Analytics Section */}
         <div className="grid lg:grid-cols-3 gap-6 mt-10">
@@ -483,8 +606,130 @@ export default function WardrobePage() {
               )}
             </CardContent>
           </Card>
+
         </div>
       </div>
+
+      {/* 💬 Floating button */}
+      <Button
+        onClick={() => setIsChatOpen(true)}
+        className="fixed bottom-6 right-6 rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-violet-500 text-white hover:scale-105 transition-transform"
+      >
+        <MessageCircle className="mr-2 w-5 h-5" />
+        GENTRY AI Stylist
+      </Button>
+
+      {/* --- Chat panel --- */}
+      <AnimatePresence>
+        {isChatOpen && (
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", stiffness: 120, damping: 20 }}
+            className="fixed top-0 right-0 h-full w-full sm:w-[380px] bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-700 shadow-2xl z-50 flex flex-col rounded-l-2xl"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b dark:border-neutral-700 bg-gradient-to-r from-pink-500 to-violet-500 text-white rounded-tl-2xl">
+              <h2 className="font-semibold text-lg flex items-center gap-2">
+                <MessageCircle className="w-5 h-5" /> GENTRY AI Stylist
+              </h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsChatOpen(false)}
+                className="hover:bg-white/20 rounded-full text-white"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            {/* Chat messages */}
+            <div
+              id="chat-scroll"
+              className="flex-1 overflow-y-auto p-4 space-y-4 bg-neutral-50 dark:bg-neutral-900"
+            >
+              {chatHistory.length === 0 && (
+                <p className="text-center text-neutral-500 text-sm mt-10">
+                  Hãy bắt đầu trò chuyện với <strong>GENTRY AI 👋</strong>
+                </p>
+              )}
+
+              {chatHistory.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  {msg.sender === "ai" && (
+                    <Avatar className="mr-2">
+                      <AvatarImage src="/ai-avatar.png" alt="AI" />
+                      <AvatarFallback>AI</AvatarFallback>
+                    </Avatar>
+                  )}
+
+                  <div
+                    className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm shadow-sm ${msg.sender === "user"
+                        ? "bg-gradient-to-r from-pink-500 to-violet-500 text-white"
+                        : "bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 border dark:border-neutral-700"
+                      }`}
+                  >
+                    <p className="whitespace-pre-line">{msg.text}</p>
+
+                    {/* 🖼️ Hình outfit tổng */}
+                    {msg.imageUrl && (
+                      <div className="mt-3">
+                        <img
+                          src={msg.imageUrl}
+                          alt="Generated Outfit"
+                          className="w-full rounded-xl border object-cover shadow"
+                        />
+                      </div>
+                    )}
+
+                    {/* 👕 Danh sách item */}
+                    {msg.outfitItems && msg.outfitItems.length > 0 && (
+                      <div className="grid grid-cols-3 gap-2 mt-3">
+                        {msg.outfitItems.map((item: any) => (
+                          <div
+                            key={item.itemId || Math.random()}
+                            className="flex flex-col items-center border dark:border-neutral-700 rounded-lg p-1 bg-neutral-50 dark:bg-neutral-800 shadow-sm"
+                          >
+                            <img
+                              src={item.itemImageUrl}
+                              alt={item.itemName}
+                              className="w-16 h-16 object-cover rounded-md"
+                            />
+                            <p className="text-[11px] font-medium text-center mt-1">{item.itemName}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Input area */}
+            <div className="border-t dark:border-neutral-700 p-3 bg-white dark:bg-neutral-900 flex gap-2">
+              <Input
+                placeholder="Nhập tin nhắn (ví dụ: 'Tôi muốn outfit thanh lịch cho trời mưa')"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && !isLoading && handleSend()}
+                className="flex-1"
+              />
+              <Button
+                onClick={handleSend}
+                disabled={isLoading}
+                className="bg-gradient-to-r from-pink-500 to-violet-500 text-white hover:scale-105 transition-transform"
+              >
+                {isLoading ? "..." : <Send className="w-4 h-4" />}
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   )
 }
