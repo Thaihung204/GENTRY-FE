@@ -3,25 +3,45 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Sparkles, Menu } from "lucide-react"
+import { Menu } from "lucide-react"
 import { useState } from "react"
 import { useAuth } from "./AuthContext"
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
-  const { user, logout } = useAuth()
+  const { user, logout, loading } = useAuth()
 
   const navItems = [
     { href: "/", label: "Trang chủ" },
     { href: "/wardrobe", label: "Tủ đồ thông minh" },
-    { href: "/outfit-suggestion", label: "Gợi ý trang phục"},
-    { href: "/ai-styling", label: "Gợi ý AI" },
+    { href: "/outfit-suggestion", label: "Gợi ý trang phục" },
     { href: "/community", label: "Cộng đồng" },
     { href: "/contact", label: "Liên hệ" },
   ]
 
+  // ✅ Nếu đang loading, hiển thị tạm logo hoặc skeleton
+  if (loading) {
+    return (
+      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b z-[9998]">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="flex items-center gap-2 font-bold text-xl">
+              <img
+                src="/gentry.png"
+                alt="GENTRY Logo"
+                className="w-25 h-25 object-contain"
+              />
+            </Link>
+            <div className="animate-pulse text-gray-400">Đang tải...</div>
+          </div>
+        </div>
+      </nav>
+    )
+  }
+
+  // ✅ Khi loading xong -> render như bình thường
   return (
-    <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b z-50">
+    <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b z-[9998] relative overflow-visible">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl">
@@ -35,25 +55,25 @@ export function Navigation() {
           {/* Desktop */}
           <div className="hidden md:flex items-center gap-8">
             {navItems.map((item) => (
-              <Link key={item.href} href={item.href} className="text-sm font-medium hover:text-primary">
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-sm font-medium hover:text-primary"
+              >
                 {item.label}
               </Link>
             ))}
+
             {user ? (
-              <div className="flex items-center gap-4">
-                <span className="text-sm">Xin chào, {user.fullName}</span>
-                <Button
-                  onClick={logout}
-                  className="btn-gentry"
-                >
-                  Đăng xuất
+              <div className="flex items-center gap-3">
+                <Button asChild variant="ghost" className="flex items-center gap-2">
+                  <Link href="/profile">
+                    👤 <span className="text-sm">{user.fullName}</span>
+                  </Link>
                 </Button>
               </div>
             ) : (
-              <Button
-                asChild
-                className="btn-gentry"
-              >
+              <Button asChild className="btn-gentry">
                 <Link href="/login">Đăng nhập</Link>
               </Button>
             )}
@@ -79,20 +99,11 @@ export function Navigation() {
                   </Link>
                 ))}
                 {user ? (
-                  <>
-                    <span className="text-sm">Xin chào, {user.fullName}</span>
-                    <Button
-                      onClick={logout}
-                      className="btn-gentry"
-                    >
-                      Đăng xuất
-                    </Button>
-                  </>
+                  <Button asChild variant="ghost" onClick={() => setIsOpen(false)}>
+                    <Link href="/profile">👤 {user.fullName}</Link>
+                  </Button>
                 ) : (
-                  <Button
-                    asChild
-                    className="btn-gentry"
-                  >
+                  <Button asChild className="btn-gentry">
                     <Link href="/login">Đăng nhập</Link>
                   </Button>
                 )}
