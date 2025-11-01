@@ -220,58 +220,64 @@ export default function WardrobePage() {
   }
 
   const handleSend = async () => {
-    if (!message.trim()) return
-    setIsLoading(true)
+  if (!message.trim()) return
+  setIsLoading(true)
 
-    // 🧍‍♂️ Thêm tin nhắn người dùng vào UI
-    setChatHistory(prev => [...prev, { sender: "user", text: message }])
+  // 🧍‍♂️ Thêm tin nhắn người dùng vào UI
+  setChatHistory(prev => [...prev, { sender: "user", text: message }])
 
-    try {
-      const response = await api.post("/outfitai/chat/gemini", {
-        userId: "fd929ff5-0b2c-4ff2-b372-caee3974196a",
-        userMessage: message,
-        occasion: "holiday",
-        weatherCondition: "sunny",
-        season: "spring",
-        additionalPreferences: "cloudy",
-      })
+  try {
+    const userId = localStorage.getItem("userId")
 
-      const data = response.data
+    const response = await api.post("/outfitai/chat/gemini", {
+      userId: userId,
+      userMessage: message,
+      occasion: "casual",
+      weatherCondition: "sunny",
+      season: "summer",
+      additionalPreferences: "comfortable"
+    })
 
-      if (data.success) {
-        setChatHistory(prev => [
-          ...prev,
-          {
-            sender: "ai",
-            text: `${data.message}\n\n${data.recommendationReason || ""}`,
-            imageUrl: data.imageUrl,
-            outfitItems: Array.isArray(data.outfitItems) ? data.outfitItems : [],
-          },
-        ])
-      } else {
-        setChatHistory(prev => [
-          ...prev,
-          { sender: "ai", text: data.message || "AI không thể tạo outfit ngay lúc này." },
-        ])
-      }
-    } catch (error: any) {
-      console.error("❌ Lỗi khi gọi API:", error)
+    const data = response.data
 
-      // Nếu server trả về lỗi HTTP
-      if (axios.isAxiosError(error)) {
-        const status = error.response?.status
-        const msg =
-          error.response?.data?.message ||
-          (status ? `Lỗi máy chủ (${status})` : "Không thể kết nối đến máy chủ.")
-        setChatHistory(prev => [...prev, { sender: "ai", text: msg }])
-      } else {
-        setChatHistory(prev => [
-          ...prev,
-          { sender: "ai", text: "Đã xảy ra lỗi không xác định khi kết nối đến AI." },
-        ])
-      }
+    // ✅ Nếu API trả về thành công
+    if (data.success) {
+      setChatHistory(prev => [
+        ...prev,
+        {
+          sender: "ai",
+          text: `${data.message}\n\n${data.recommendationReason || ""}`,
+          imageUrl: data.imageUrl,
+          outfitItems: Array.isArray(data.outfitItems) ? data.outfitItems : [],
+        },
+      ])
+    } else {
+      setChatHistory(prev => [
+        ...prev,
+        { sender: "ai", text: data.message || "AI không thể tạo outfit ngay lúc này." },
+      ])
     }
+  } catch (error: any) {
+    console.error("❌ Lỗi khi gọi API:", error)
+
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status
+      const msg =
+        error.response?.data?.message ||
+        (status ? `Lỗi máy chủ (${status})` : "Không thể kết nối đến máy chủ.")
+      setChatHistory(prev => [...prev, { sender: "ai", text: msg }])
+    } else {
+      setChatHistory(prev => [
+        ...prev,
+        { sender: "ai", text: "Đã xảy ra lỗi không xác định khi kết nối đến AI." },
+      ])
+    }
+  } finally {
+    setIsLoading(false)
+    setMessage("") // 🧹 Reset ô input
   }
+}
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
