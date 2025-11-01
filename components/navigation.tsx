@@ -41,7 +41,7 @@ export function Navigation() {
 
   // ✅ Khi loading xong -> render như bình thường
   return (
-    <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b z-[9998] relative overflow-visible">
+    <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl">
