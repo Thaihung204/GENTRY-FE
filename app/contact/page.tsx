@@ -75,7 +75,7 @@ export default function ContactPage() {
       role: "Founder & CEO",
       description:
         "Nhà sáng lập và định hướng chiến lược phát triển của GENTRY. Dẫn dắt đội ngũ kết hợp công nghệ AI với phong cách thời trang hiện đại.",
-      image: "professional marketing manager smiling with city office background",
+      image: "bao.jpg",
     },
     {
       name: "Phạm Đăng Phát",

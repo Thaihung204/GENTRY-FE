@@ -290,17 +290,17 @@ export default function HomePage() {
                 <CardContent className="space-y-4">
                   <h5 className="font-bold">Kết quả Lọc</h5>
                   <div className="space-y-3">
-                    {[1, 2, 3].map((item) => (
+                    {["tp1.jpg", "tp2.jpg", "tp3.jpg"].map((item) => (
                       <div key={item} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                         <Image
-                          src={`/stylish-urban-outfit.png?height=60&width=60&query=outfit ${item}`}
+                          src={`/${item}`}
                           alt={`Trang phục ${item}`}
                           width={60}
                           height={60}
                           className="rounded-lg"
                         />
                         <div>
-                          <h6 className="font-medium">Trang phục {item}</h6>
+                          <h6 className="font-medium">Trang phục</h6>
                         </div>
                       </div>
                     ))}
@@ -329,19 +329,19 @@ export default function HomePage() {
             {[
               {
                 name: "Nike Air Force 1 Trắng",
-                price: "3.519.000₫",
+                // price: "3.519.000₫",
                 image: "/giay1.png",
                 url: "https://shopee.vn/-CH%C3%8CNH-H%C3%83NG-Gi%C3%A0y-Th%E1%BB%83-Thao-Nam-N%E1%BB%AF-Tr%E1%BA%AFng-Gi%C3%A0y-AIR-FORCE-1-'07-Gi%C3%A0y-AF1-_-H%C3%A0ng-Ch%C3%ADnh-H%C3%A3ng-NAF107-2--i.1528317771.40000352314",
               },
               {
                 name: "Áo khoác gió 2 lớp TORANO",
-                price: "545.000₫",
+                // price: "545.000₫",
                 image: "/ao1.png",
                 url: "https://shopee.vn/product/835435/21465825718",
               },
               {
                 name: "Quần tây nam ống suông đứng JBAGY Straight Trouser",
-                price: "219.880₫",
+                // price: "219.880₫",
                 image: "/quan1.png",
                 url: "https://shopee.vn/New-Arrivals-Qu%E1%BA%A7n-t%C3%A2y-nam-%E1%BB%91ng-su%C3%B4ng-%C4%91%E1%BB%A9ng-JBAGY-Straight-Trouser-v%E1%BA%A3i-%C3%A2u-cao-c%E1%BA%A5p-JA0102-i.259681663.42108216211",
               },
@@ -361,7 +361,7 @@ export default function HomePage() {
 
                 <div className="p-6 space-y-3">
                   <h3 className="text-lg font-semibold line-clamp-2 text-foreground">{product.name}</h3>
-                  <p className="text-xl font-bold text-blue-600 dark:text-blue-400">{product.price}</p>
+                  {/* <p className="text-xl font-bold text-blue-600 dark:text-blue-400">{product.price}</p> */}
 
                   {/* ✅ Sửa phần này */}
                   <Button size="sm" className="btn-gentry w-full mt-2" asChild>
