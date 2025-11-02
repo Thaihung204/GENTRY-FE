@@ -19,37 +19,30 @@ export function Navigation() {
     { href: "/contact", label: "Liên hệ" },
   ]
 
-  // ✅ Nếu đang loading, hiển thị tạm logo hoặc skeleton
+  // ✅ Nếu đang loading
   if (loading) {
     return (
       <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b z-[9998]">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-              <img
-                src="/gentry.png"
-                alt="GENTRY Logo"
-                className="w-25 h-25 object-contain"
-              />
+              <img src="/gentry.png" alt="GENTRY Logo" className="w-25 h-25 object-contain" />
             </Link>
-            <div className="animate-pulse text-gray-400">Đang tải...</div>
           </div>
         </div>
       </nav>
     )
   }
 
-  // ✅ Khi loading xong -> render như bình thường
+  // ✅ Khi user đã load
+  const profileLink = user?.role === "Admin" ? "/admin" : "/profile"
+
   return (
     <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-            <img
-              src="/gentry.png"
-              alt="GENTRY Logo"
-              className="w-25 h-25 object-contain"
-            />
+            <img src="/gentry.png" alt="GENTRY Logo" className="w-25 h-25 object-contain" />
           </Link>
 
           {/* Desktop */}
@@ -66,10 +59,22 @@ export function Navigation() {
 
             {user ? (
               <div className="flex items-center gap-3">
+                {/* ✅ Nếu là Admin thì link đến /admin, ngược lại /profile */}
                 <Button asChild variant="ghost" className="flex items-center gap-2">
-                  <Link href="/profile">
+                  <Link href={profileLink}>
                     👤 <span className="text-sm">{user.fullName}</span>
                   </Link>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    await logout()
+                    window.location.href = "/login"
+                  }}
+                >
+                  Đăng xuất
                 </Button>
               </div>
             ) : (
@@ -98,10 +103,30 @@ export function Navigation() {
                     {item.label}
                   </Link>
                 ))}
+
                 {user ? (
-                  <Button asChild variant="ghost" onClick={() => setIsOpen(false)}>
-                    <Link href="/profile">👤 {user.fullName}</Link>
-                  </Button>
+                  <>
+                    {/* ✅ Profile link chuyển hướng theo role */}
+                    <Button
+                      asChild
+                      variant="ghost"
+                      onClick={() => setIsOpen(false)}
+                      className="flex justify-start"
+                    >
+                      <Link href={profileLink}>👤 {user.fullName}</Link>
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        await logout()
+                        window.location.href = "/login"
+                      }}
+                    >
+                      Đăng xuất
+                    </Button>
+                  </>
                 ) : (
                   <Button asChild className="btn-gentry">
                     <Link href="/login">Đăng nhập</Link>

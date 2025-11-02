@@ -16,34 +16,18 @@ interface AuthContextType {
   setUser: (user: User | null) => void
   fetchUser: () => Promise<void>
   logout: () => Promise<void>
+  loading: boolean // ✅ thêm
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null)
-
-  // ✅ 1. Load user từ localStorage khi khởi tạo
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user")
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
-    } else {
-      fetchUser() // fallback: gọi API nếu chưa có
-    }
-  }, [])
-
-  // ✅ 2. Lưu user vào localStorage mỗi khi thay đổi
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user))
-    } else {
-      localStorage.removeItem("user")
-    }
-  }, [user])
+  const [loading, setLoading] = useState(true) // ✅ state chờ user load xong
 
   const fetchUser = async () => {
     try {
+      setLoading(true)
       const token = localStorage.getItem("accessToken")
       if (!token) {
         setUser(null)
@@ -61,8 +45,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           refreshToken: localStorage.getItem("refreshToken") || "",
         }
         setUser(userData)
-
-        // ✅ Lưu vào localStorage để giữ trạng thái khi refresh
         localStorage.setItem("user", JSON.stringify(userData))
       } else {
         setUser(null)
@@ -72,8 +54,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error("Lỗi fetchUser:", err)
       setUser(null)
       localStorage.removeItem("user")
+    } finally {
+      setLoading(false)
     }
   }
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user")
+    if (storedUser) {
+      setUser(JSON.parse(storedUser))
+      setLoading(false)
+    } else {
+      fetchUser().finally(() => setLoading(false))
+    }
+  }, [])
 
   const logout = async () => {
     try {
@@ -91,7 +85,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, setUser, fetchUser, logout }}>
+    <AuthContext.Provider value={{ user, setUser, fetchUser, logout, loading }}>
       {children}
     </AuthContext.Provider>
   )

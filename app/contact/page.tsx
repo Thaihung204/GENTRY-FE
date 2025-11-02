@@ -28,8 +28,16 @@ import {
   Map,
 } from "lucide-react"
 import Image from "next/image"
+import api from "../config/api"
 
 export default function ContactPage() {
+  const [feedback, setFeedback] = useState({
+    name: "",
+    rating: 5,
+    content: "",
+  })
+  const [showThanks, setShowThanks] = useState(false)
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -62,49 +70,49 @@ export default function ContactPage() {
   }
 
   const teamMembers = [
-        {
-          name: "Đỗ Trọng Nguyên Bảo",
-          role: "Founder & CEO",
-          description:
-            "Nhà sáng lập và định hướng chiến lược phát triển của GENTRY. Dẫn dắt đội ngũ kết hợp công nghệ AI với phong cách thời trang hiện đại.",
-          image: "professional marketing manager smiling with city office background",
-        },
-        {
-          name: "Phạm Đăng Phát",
-          role: "Frontend Developer",
-          description:
-            "Phụ trách xây dựng và tối ưu giao diện người dùng. Mang đến trải nghiệm mượt mà và thẩm mỹ cho nền tảng GENTRY.",
-          image: "phat.png",
-        },
-        {
-          name: "Lê Tấn Đại",
-          role: "AI Engineer",
-          description:
-            "Chuyên gia trí tuệ nhân tạo, phát triển các mô hình gợi ý outfit và phân tích xu hướng thời trang thông minh.",
-          image: "dai.png",
-        },
-        {
-          name: "Huỳnh Bá Thái Hùng",
-          role: "Backend Developer",
-          description:
-            "Đảm nhiệm phát triển hệ thống máy chủ, API và quản lý cơ sở dữ liệu. Đảm bảo nền tảng GENTRY vận hành ổn định, an toàn.",
-          image: "thaihung.jpg",
-        },
-        {
-          name: "Nguyễn Võ Bảo Long",
-          role: "Marketing Manager",
-          description:
-            "Chịu trách nhiệm phát triển thương hiệu và chiến lược truyền thông, lan tỏa hình ảnh GENTRY đến cộng đồng người dùng yêu thời trang.",
-          image: "long.png",
-        },
-        {
-          name: "Nguyễn Đức Anh",
-          role: "UI/UX Designer",
-          description:
-            "Thiết kế giao diện và trải nghiệm người dùng với phong cách tinh tế, hiện đại, phản ánh cá tính của thương hiệu GENTRY.",
-          image: "anh.png",
-        },
-      ]
+    {
+      name: "Đỗ Trọng Nguyên Bảo",
+      role: "Founder & CEO",
+      description:
+        "Nhà sáng lập và định hướng chiến lược phát triển của GENTRY. Dẫn dắt đội ngũ kết hợp công nghệ AI với phong cách thời trang hiện đại.",
+      image: "professional marketing manager smiling with city office background",
+    },
+    {
+      name: "Phạm Đăng Phát",
+      role: "Frontend Developer",
+      description:
+        "Phụ trách xây dựng và tối ưu giao diện người dùng. Mang đến trải nghiệm mượt mà và thẩm mỹ cho nền tảng GENTRY.",
+      image: "phat.png",
+    },
+    {
+      name: "Lê Tấn Đại",
+      role: "AI Engineer",
+      description:
+        "Chuyên gia trí tuệ nhân tạo, phát triển các mô hình gợi ý outfit và phân tích xu hướng thời trang thông minh.",
+      image: "dai.png",
+    },
+    {
+      name: "Huỳnh Bá Thái Hùng",
+      role: "Backend Developer",
+      description:
+        "Đảm nhiệm phát triển hệ thống máy chủ, API và quản lý cơ sở dữ liệu. Đảm bảo nền tảng GENTRY vận hành ổn định, an toàn.",
+      image: "thaihung.jpg",
+    },
+    {
+      name: "Nguyễn Võ Bảo Long",
+      role: "Marketing Manager",
+      description:
+        "Chịu trách nhiệm phát triển thương hiệu và chiến lược truyền thông, lan tỏa hình ảnh GENTRY đến cộng đồng người dùng yêu thời trang.",
+      image: "long.png",
+    },
+    {
+      name: "Nguyễn Đức Anh",
+      role: "UI/UX Designer",
+      description:
+        "Thiết kế giao diện và trải nghiệm người dùng với phong cách tinh tế, hiện đại, phản ánh cá tính của thương hiệu GENTRY.",
+      image: "anh.png",
+    },
+  ]
 
 
   const contactMethods = [
@@ -380,6 +388,111 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+
+      {/* Feedback Section */}
+      <section className="py-12 bg-gradient-to-r from-purple-50 via-white to-blue-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Đánh Giá & Góp Ý
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Chia sẻ cảm nhận của bạn về GENTRY để chúng tôi có thể phục vụ tốt hơn.
+            </p>
+          </div>
+
+          <div className="max-w-3xl mx-auto">
+            <Card className="shadow-md border border-purple-100">
+              <CardContent className="p-8 space-y-6">
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault()
+                    try {
+                      const res = await api.post("/feedbacks", {
+                        name: feedback.name,
+                        rating: feedback.rating,
+                        content: feedback.content,
+                      })
+                      if (res.data) {
+                        setFeedback({ name: "", rating: 5, content: "" })
+                        setShowThanks(true)
+                      }
+                    } catch (err) {
+                      console.error("Gửi feedback thất bại:", err)
+                    }
+                  }}
+                >
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Họ và tên *</Label>
+                      <Input
+                        id="name"
+                        value={feedback.name}
+                        onChange={(e) => setFeedback({ ...feedback, name: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Đánh giá *</Label>
+                      <div className="flex items-center gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setFeedback({ ...feedback, rating: star })}
+                            className={`text-2xl transition ${star <= feedback.rating ? "text-yellow-400" : "text-gray-300"
+                              }`}
+                          >
+                            ★
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="content">Nội dung góp ý *</Label>
+                      <Textarea
+                        id="content"
+                        rows={4}
+                        value={feedback.content}
+                        onChange={(e) => setFeedback({ ...feedback, content: e.target.value })}
+                        placeholder="Hãy chia sẻ suy nghĩ của bạn..."
+                        required
+                      />
+                    </div>
+
+                    <div className="text-center pt-4">
+                      <Button type="submit" className="px-8">
+                        Gửi Đánh Giá
+                      </Button>
+                    </div>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Modal cảm ơn sau khi gửi feedback */}
+        <Dialog open={showThanks} onOpenChange={setShowThanks}>
+          <DialogContent className="text-center">
+            <DialogHeader>
+              <div className="mx-auto mb-4">
+                <CheckCircle className="w-16 h-16 text-green-500" />
+              </div>
+              <DialogTitle className="text-xl">Cảm ơn phản hồi của bạn!</DialogTitle>
+            </DialogHeader>
+            <p className="text-muted-foreground">
+              GENTRY trân trọng ý kiến đóng góp của bạn để cải thiện trải nghiệm người dùng.
+            </p>
+            <Button onClick={() => setShowThanks(false)} className="mt-4">
+              Đóng
+            </Button>
+          </DialogContent>
+        </Dialog>
+      </section>
+
 
       {/* FAQ Section */}
       <section className="py-12 bg-white/50">

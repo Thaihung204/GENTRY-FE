@@ -229,13 +229,8 @@ export default function WardrobePage() {
   try {
     const userId = localStorage.getItem("userId")
 
-    const response = await api.post("/outfitai/chat/gemini", {
-      userId: userId,
-      userMessage: message,
-      occasion: "casual",
-      weatherCondition: "sunny",
-      season: "summer",
-      additionalPreferences: "comfortable"
+    const response = await api.post("/outfitai/chat/", {
+      userMessage: message
     })
 
     const data = response.data
@@ -347,7 +342,7 @@ export default function WardrobePage() {
                   Thêm Trang Phục
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl">
+              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Thêm Trang Phục Mới</DialogTitle>
                 </DialogHeader>
@@ -622,7 +617,7 @@ export default function WardrobePage() {
         className="fixed bottom-6 right-6 rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-violet-500 text-white hover:scale-105 transition-transform"
       >
         <MessageCircle className="mr-2 w-5 h-5" />
-        GENTRY AI Stylist
+        Gợi ý AI
       </Button>
 
       {/* --- Chat panel --- */}

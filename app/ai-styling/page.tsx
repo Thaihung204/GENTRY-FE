@@ -30,7 +30,7 @@ export default function AIStylingPage() {
 
     try {
       const response = await api.post("/outfitai/chat/gemini", {
-        userId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        userId: "e787cd23-ca09-452b-81e7-b6a256e793d9",
         userMessage: message,
         occasion: "holiday",
         weatherCondition: "sunny",
