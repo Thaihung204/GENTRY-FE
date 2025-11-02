@@ -22,7 +22,7 @@ export function Navigation() {
   // ✅ Nếu đang loading
   if (loading) {
     return (
-      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b z-[9998]">
+      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b z-[99999]">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl">
@@ -38,7 +38,7 @@ export function Navigation() {
   const profileLink = user?.role === "Admin" ? "/admin" : "/profile"
 
   return (
-    <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b">
+    <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b z-[99999]">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2 font-bold text-xl">

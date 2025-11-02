@@ -628,7 +628,7 @@ export default function WardrobePage() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 120, damping: 20 }}
-            className="fixed top-0 right-0 h-full w-full sm:w-[380px] bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-700 shadow-2xl z-50 flex flex-col rounded-l-2xl"
+            className="fixed top-0 right-0 h-full w-full sm:w-[380px] bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-700 shadow-2xl z-[999999] flex flex-col rounded-l-2xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b dark:border-neutral-700 bg-gradient-to-r from-pink-500 to-violet-500 text-white rounded-tl-2xl">
