@@ -312,84 +312,149 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-  <section className="py-20 bg-[var(--muted)]/40">
-    <div className="container mx-auto px-4">
-      <div className="text-center space-y-4 mb-12">
-        <h2 className="text-4xl font-bold text-foreground">Được tin dùng</h2>
-        <p className="text-xl text-muted-foreground">
-          Cộng đồng chia sẻ trải nghiệm phối đồ thực tế cùng GENTRY.
-        </p>
-      </div>
+      {/* Product Promotion Section */}
+      <section className="py-20 bg-gradient-to-b from-blue-50 via-white to-purple-50 dark:from-navy-950 dark:via-navy-900 dark:to-navy-800">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12 space-y-4">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Gợi ý sản phẩm nổi bật
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Một vài món đồ được yêu thích — hoàn hảo để phối cùng outfit của bạn.
+            </p>
+          </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        {[
-          {
-            name: "Sarah Chen",
-            role: "Quản lý Marketing",
-            text: "Điều này đã hoàn toàn thay đổi thói quen buổi sáng của tôi. Tôi tiết kiệm được rất nhiều thời gian và luôn cảm thấy tự tin với những gì mình mặc.",
-            avatar: "https://randomuser.me/api/portraits/women/68.jpg",
-          },
-          {
-            name: "David Kim",
-            role: "Lập trình viên",
-            text: "Tôi yêu thích các gợi ý từ AI. Giống như có một stylist cá nhân thực sự hiểu phong cách của tôi.",
-            avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-          },
-          {
-            name: "Maria Rodriguez",
-            role: "Giám đốc Sáng tạo",
-            text: "Tôi không bao giờ phải vội vàng chọn trang phục nữa. Ứng dụng này thực sự giúp tôi tận dụng tối đa tủ quần áo của mình.",
-            avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-          },
-        ].map((testimonial, index) => (
-          <Card
-            key={index}
-            className="p-6 border border-[var(--border)] shadow-md hover:shadow-lg transition-all bg-card/80 backdrop-blur-sm"
-          >
-            <CardContent className="space-y-4">
-              <div className="flex gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
+          {/* Product Grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                name: "Nike Air Force 1 Trắng",
+                price: "3.519.000₫",
+                image: "/giay1.png",
+                url: "https://shopee.vn/-CH%C3%8CNH-H%C3%83NG-Gi%C3%A0y-Th%E1%BB%83-Thao-Nam-N%E1%BB%AF-Tr%E1%BA%AFng-Gi%C3%A0y-AIR-FORCE-1-'07-Gi%C3%A0y-AF1-_-H%C3%A0ng-Ch%C3%ADnh-H%C3%A3ng-NAF107-2--i.1528317771.40000352314",
+              },
+              {
+                name: "Áo khoác gió 2 lớp TORANO",
+                price: "545.000₫",
+                image: "/ao1.png",
+                url: "https://shopee.vn/product/835435/21465825718",
+              },
+              {
+                name: "Quần tây nam ống suông đứng JBAGY Straight Trouser",
+                price: "219.880₫",
+                image: "/quan1.png",
+                url: "https://shopee.vn/New-Arrivals-Qu%E1%BA%A7n-t%C3%A2y-nam-%E1%BB%91ng-su%C3%B4ng-%C4%91%E1%BB%A9ng-JBAGY-Straight-Trouser-v%E1%BA%A3i-%C3%A2u-cao-c%E1%BA%A5p-JA0102-i.259681663.42108216211",
+              },
+            ].map((product, index) => (
+              <div
+                key={index}
+                className="group block overflow-hidden rounded-2xl bg-white dark:bg-navy-900 border border-gray-200 dark:border-gray-700 shadow-md hover:shadow-lg transition-all"
+              >
+                <div className="relative aspect-[4/5] overflow-hidden">
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
 
-              <p className="text-muted-foreground italic">
-                “{testimonial.text}”
-              </p>
+                <div className="p-6 space-y-3">
+                  <h3 className="text-lg font-semibold line-clamp-2 text-foreground">{product.name}</h3>
+                  <p className="text-xl font-bold text-blue-600 dark:text-blue-400">{product.price}</p>
 
-              <div className="flex items-center gap-3 mt-4">
-                <img
-                  src={testimonial.avatar}
-                  alt={testimonial.name}
-                  className="w-12 h-12 rounded-full object-cover border border-[var(--border)]"
-                />
-                <div>
-                  <h6 className="font-semibold text-foreground">
-                    {testimonial.name}
-                  </h6>
-                  <span className="text-sm text-muted-foreground">
-                    {testimonial.role}
-                  </span>
+                  {/* ✅ Sửa phần này */}
+                  <Button size="sm" className="btn-gentry w-full mt-2" asChild>
+                    <Link href={product.url} target="_blank" rel="noopener noreferrer">
+                      Xem sản phẩm
+                    </Link>
+                  </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            ))}
+          </div>
 
-      <div className="text-center mt-12">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-          ))}
         </div>
-        <span className="text-muted-foreground">
-          4.8/5 từ <span className="font-semibold text-foreground">2,847</span> đánh giá
-        </span>
-      </div>
-    </div>
-  </section>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-[var(--muted)]/40">
+        <div className="container mx-auto px-4">
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-4xl font-bold text-foreground">Được tin dùng</h2>
+            <p className="text-xl text-muted-foreground">
+              Cộng đồng chia sẻ trải nghiệm phối đồ thực tế cùng GENTRY.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            {[
+              {
+                name: "Sarah Chen",
+                role: "Quản lý Marketing",
+                text: "Điều này đã hoàn toàn thay đổi thói quen buổi sáng của tôi. Tôi tiết kiệm được rất nhiều thời gian và luôn cảm thấy tự tin với những gì mình mặc.",
+                avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+              },
+              {
+                name: "David Kim",
+                role: "Lập trình viên",
+                text: "Tôi yêu thích các gợi ý từ AI. Giống như có một stylist cá nhân thực sự hiểu phong cách của tôi.",
+                avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+              },
+              {
+                name: "Maria Rodriguez",
+                role: "Giám đốc Sáng tạo",
+                text: "Tôi không bao giờ phải vội vàng chọn trang phục nữa. Ứng dụng này thực sự giúp tôi tận dụng tối đa tủ quần áo của mình.",
+                avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+              },
+            ].map((testimonial, index) => (
+              <Card
+                key={index}
+                className="p-6 border border-[var(--border)] shadow-md hover:shadow-lg transition-all bg-card/80 backdrop-blur-sm"
+              >
+                <CardContent className="space-y-4">
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    ))}
+                  </div>
+
+                  <p className="text-muted-foreground italic">
+                    “{testimonial.text}”
+                  </p>
+
+                  <div className="flex items-center gap-3 mt-4">
+                    <img
+                      src={testimonial.avatar}
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full object-cover border border-[var(--border)]"
+                    />
+                    <div>
+                      <h6 className="font-semibold text-foreground">
+                        {testimonial.name}
+                      </h6>
+                      <span className="text-sm text-muted-foreground">
+                        {testimonial.role}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+              ))}
+            </div>
+            <span className="text-muted-foreground">
+              4.8/5 từ <span className="font-semibold text-foreground">2,847</span> đánh giá
+            </span>
+          </div>
+        </div>
+      </section>
 
 
       {/* Footer */}

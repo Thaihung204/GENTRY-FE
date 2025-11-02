@@ -111,9 +111,11 @@ export default function ProfilePage() {
 
   // 🔹 Xóa tài khoản
   const handleDelete = async () => {
+    const userId = localStorage.getItem("userId")
+
     if (!confirm("Bạn có chắc muốn xóa tài khoản này không?")) return
     try {
-      await api.delete("/users/profile", {
+      await api.delete(`/users/${userId}`, {
         headers: { Authorization: `Bearer ${user?.accessToken}` },
       })
       logout()

@@ -227,17 +227,15 @@ export default function WardrobePage() {
     setChatHistory(prev => [...prev, { sender: "user", text: message }])
 
     try {
-      const response = await api.post("/outfitai/chat/gemini", {
-        userId: "fd929ff5-0b2c-4ff2-b372-caee3974196a",
-        userMessage: message,
-        occasion: "holiday",
-        weatherCondition: "sunny",
-        season: "spring",
-        additionalPreferences: "cloudy",
+      const userId = localStorage.getItem("userId")
+
+      const response = await api.post("/outfitai/chat/", {
+        userMessage: message
       })
 
       const data = response.data
 
+      // ✅ Nếu API trả về thành công
       if (data.success) {
         setChatHistory(prev => [
           ...prev,
@@ -257,7 +255,6 @@ export default function WardrobePage() {
     } catch (error: any) {
       console.error("❌ Lỗi khi gọi API:", error)
 
-      // Nếu server trả về lỗi HTTP
       if (axios.isAxiosError(error)) {
         const status = error.response?.status
         const msg =
@@ -270,8 +267,12 @@ export default function WardrobePage() {
           { sender: "ai", text: "Đã xảy ra lỗi không xác định khi kết nối đến AI." },
         ])
       }
+    } finally {
+      setIsLoading(false)
+      setMessage("") // 🧹 Reset ô input
     }
   }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -341,7 +342,7 @@ export default function WardrobePage() {
                   Thêm Trang Phục
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl">
+              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Thêm Trang Phục Mới</DialogTitle>
                 </DialogHeader>
@@ -616,7 +617,7 @@ export default function WardrobePage() {
         className="fixed bottom-6 right-6 rounded-full shadow-lg bg-gradient-to-r from-pink-500 to-violet-500 text-white hover:scale-105 transition-transform"
       >
         <MessageCircle className="mr-2 w-5 h-5" />
-        GENTRY AI Stylist
+        Gợi ý AI
       </Button>
 
       {/* --- Chat panel --- */}
@@ -673,33 +674,26 @@ export default function WardrobePage() {
                         : "bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 border dark:border-neutral-700"
                       }`}
                   >
+                    {/* 💬 Nội dung tin nhắn */}
                     <p className="whitespace-pre-line">{msg.text}</p>
 
-                    {/* 🖼️ Hình outfit tổng */}
-                    {msg.imageUrl && (
-                      <div className="mt-3">
-                        <img
-                          src={msg.imageUrl}
-                          alt="Generated Outfit"
-                          className="w-full rounded-xl border object-cover shadow"
-                        />
-                      </div>
-                    )}
-
-                    {/* 👕 Danh sách item */}
+                    {/* ❌ Bỏ ảnh lớn tổng outfit */}
+                    {/* 🖼️ Thay bằng danh sách nhiều ảnh nhỏ */}
                     {msg.outfitItems && msg.outfitItems.length > 0 && (
                       <div className="grid grid-cols-3 gap-2 mt-3">
                         {msg.outfitItems.map((item: any) => (
                           <div
                             key={item.itemId || Math.random()}
-                            className="flex flex-col items-center border dark:border-neutral-700 rounded-lg p-1 bg-neutral-50 dark:bg-neutral-800 shadow-sm"
+                            className="flex flex-col items-center border dark:border-neutral-700 rounded-lg p-1 bg-neutral-50 dark:bg-neutral-800 hover:shadow-md transition-shadow cursor-pointer"
                           >
                             <img
                               src={item.itemImageUrl}
                               alt={item.itemName}
                               className="w-16 h-16 object-cover rounded-md"
                             />
-                            <p className="text-[11px] font-medium text-center mt-1">{item.itemName}</p>
+                            <p className="text-[11px] font-medium text-center mt-1 line-clamp-2">
+                              {item.itemName}
+                            </p>
                           </div>
                         ))}
                       </div>
@@ -729,6 +723,7 @@ export default function WardrobePage() {
           </motion.div>
         )}
       </AnimatePresence>
+
 
     </div>
   )

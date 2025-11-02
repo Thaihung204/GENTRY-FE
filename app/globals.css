@@ -115,6 +115,18 @@
   --footer-border: oklch(0.22 0.02 260);
 }
 
+/* Làm gọn scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(150, 150, 150, 0.4);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 100, 100, 0.6);
+}
+
 /* Tailwind mapping giữ nguyên */
 @theme inline {
   --color-background: var(--background);
