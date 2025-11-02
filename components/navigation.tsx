@@ -14,7 +14,7 @@ export function Navigation() {
   const navItems = [
     { href: "/", label: "Trang chủ" },
     { href: "/wardrobe", label: "Tủ đồ thông minh" },
-    { href: "/outfit-suggestion", label: "Gợi ý trang phục" },
+    // { href: "/outfit-suggestion", label: "Gợi ý trang phục" },
     { href: "/community", label: "Cộng đồng" },
     { href: "/contact", label: "Liên hệ" },
   ]
