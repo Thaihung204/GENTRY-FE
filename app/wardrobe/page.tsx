@@ -220,58 +220,58 @@ export default function WardrobePage() {
   }
 
   const handleSend = async () => {
-  if (!message.trim()) return
-  setIsLoading(true)
+    if (!message.trim()) return
+    setIsLoading(true)
 
-  // 🧍‍♂️ Thêm tin nhắn người dùng vào UI
-  setChatHistory(prev => [...prev, { sender: "user", text: message }])
+    // 🧍‍♂️ Thêm tin nhắn người dùng vào UI
+    setChatHistory(prev => [...prev, { sender: "user", text: message }])
 
-  try {
-    const userId = localStorage.getItem("userId")
+    try {
+      const userId = localStorage.getItem("userId")
 
-    const response = await api.post("/outfitai/chat/", {
-      userMessage: message
-    })
+      const response = await api.post("/outfitai/chat/", {
+        userMessage: message
+      })
 
-    const data = response.data
+      const data = response.data
 
-    // ✅ Nếu API trả về thành công
-    if (data.success) {
-      setChatHistory(prev => [
-        ...prev,
-        {
-          sender: "ai",
-          text: `${data.message}\n\n${data.recommendationReason || ""}`,
-          imageUrl: data.imageUrl,
-          outfitItems: Array.isArray(data.outfitItems) ? data.outfitItems : [],
-        },
-      ])
-    } else {
-      setChatHistory(prev => [
-        ...prev,
-        { sender: "ai", text: data.message || "AI không thể tạo outfit ngay lúc này." },
-      ])
+      // ✅ Nếu API trả về thành công
+      if (data.success) {
+        setChatHistory(prev => [
+          ...prev,
+          {
+            sender: "ai",
+            text: `${data.message}\n\n${data.recommendationReason || ""}`,
+            imageUrl: data.imageUrl,
+            outfitItems: Array.isArray(data.outfitItems) ? data.outfitItems : [],
+          },
+        ])
+      } else {
+        setChatHistory(prev => [
+          ...prev,
+          { sender: "ai", text: data.message || "AI không thể tạo outfit ngay lúc này." },
+        ])
+      }
+    } catch (error: any) {
+      console.error("❌ Lỗi khi gọi API:", error)
+
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status
+        const msg =
+          error.response?.data?.message ||
+          (status ? `Lỗi máy chủ (${status})` : "Không thể kết nối đến máy chủ.")
+        setChatHistory(prev => [...prev, { sender: "ai", text: msg }])
+      } else {
+        setChatHistory(prev => [
+          ...prev,
+          { sender: "ai", text: "Đã xảy ra lỗi không xác định khi kết nối đến AI." },
+        ])
+      }
+    } finally {
+      setIsLoading(false)
+      setMessage("") // 🧹 Reset ô input
     }
-  } catch (error: any) {
-    console.error("❌ Lỗi khi gọi API:", error)
-
-    if (axios.isAxiosError(error)) {
-      const status = error.response?.status
-      const msg =
-        error.response?.data?.message ||
-        (status ? `Lỗi máy chủ (${status})` : "Không thể kết nối đến máy chủ.")
-      setChatHistory(prev => [...prev, { sender: "ai", text: msg }])
-    } else {
-      setChatHistory(prev => [
-        ...prev,
-        { sender: "ai", text: "Đã xảy ra lỗi không xác định khi kết nối đến AI." },
-      ])
-    }
-  } finally {
-    setIsLoading(false)
-    setMessage("") // 🧹 Reset ô input
   }
-}
 
 
   return (
@@ -674,33 +674,26 @@ export default function WardrobePage() {
                         : "bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-100 border dark:border-neutral-700"
                       }`}
                   >
+                    {/* 💬 Nội dung tin nhắn */}
                     <p className="whitespace-pre-line">{msg.text}</p>
 
-                    {/* 🖼️ Hình outfit tổng */}
-                    {msg.imageUrl && (
-                      <div className="mt-3">
-                        <img
-                          src={msg.imageUrl}
-                          alt="Generated Outfit"
-                          className="w-full rounded-xl border object-cover shadow"
-                        />
-                      </div>
-                    )}
-
-                    {/* 👕 Danh sách item */}
+                    {/* ❌ Bỏ ảnh lớn tổng outfit */}
+                    {/* 🖼️ Thay bằng danh sách nhiều ảnh nhỏ */}
                     {msg.outfitItems && msg.outfitItems.length > 0 && (
                       <div className="grid grid-cols-3 gap-2 mt-3">
                         {msg.outfitItems.map((item: any) => (
                           <div
                             key={item.itemId || Math.random()}
-                            className="flex flex-col items-center border dark:border-neutral-700 rounded-lg p-1 bg-neutral-50 dark:bg-neutral-800 shadow-sm"
+                            className="flex flex-col items-center border dark:border-neutral-700 rounded-lg p-1 bg-neutral-50 dark:bg-neutral-800 hover:shadow-md transition-shadow cursor-pointer"
                           >
                             <img
                               src={item.itemImageUrl}
                               alt={item.itemName}
                               className="w-16 h-16 object-cover rounded-md"
                             />
-                            <p className="text-[11px] font-medium text-center mt-1">{item.itemName}</p>
+                            <p className="text-[11px] font-medium text-center mt-1 line-clamp-2">
+                              {item.itemName}
+                            </p>
                           </div>
                         ))}
                       </div>
@@ -730,6 +723,7 @@ export default function WardrobePage() {
           </motion.div>
         )}
       </AnimatePresence>
+
 
     </div>
   )
