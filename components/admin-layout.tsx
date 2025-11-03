@@ -4,7 +4,7 @@ import type React from "react"
 import { useState } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { Users, Shirt, MessageSquare, BarChart3, Settings, Menu, X, Home } from "lucide-react"
+import { Users, Shirt, MessageSquare, BarChart3, Settings, Menu, X, Home, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { useAuth } from "./AuthContext"
@@ -17,8 +17,8 @@ interface AdminLayoutProps {
 const navigation = [
   {
     name: "Dashboard",
-    href: "/",
-    icon: Home,
+    href: "/admin",
+    icon: LayoutDashboard,
   },
   {
     name: "Quản lý người dùng",
