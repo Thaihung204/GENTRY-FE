@@ -120,7 +120,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 >
                   <item.icon className="mr-3 h-5 w-5" />
                   {item.name}
-                  <span className="ml-auto">{expandedItems.includes(item.name) ? "−" : "+"}</span>
+                  <span className="ml-auto">{expandedItems.includes(item.name)}</span>
                 </Button>
               )}
 
