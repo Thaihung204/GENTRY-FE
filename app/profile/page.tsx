@@ -4,23 +4,28 @@ import { useEffect, useState } from "react"
 import { useAuth } from "@/components/AuthContext"
 import api from "../config/api"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Sparkles,
   User,
   Mail,
   Phone,
   Calendar,
-  Edit,
-  Trash2,
   Save,
-  X,
   LogOut,
+  Trash2,
 } from "lucide-react"
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
+import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 
 interface Profile {
@@ -45,11 +50,9 @@ interface Profile {
 export default function ProfilePage() {
   const { user, logout } = useAuth()
   const [profile, setProfile] = useState<Profile | null>(null)
-  const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState<Partial<Profile>>({})
   const router = useRouter()
 
-  // 🔹 Lấy thông tin người dùng
   useEffect(() => {
     if (!user) {
       router.push("/login")
@@ -71,12 +74,10 @@ export default function ProfilePage() {
     fetchProfile()
   }, [user])
 
-  // 🔹 Cập nhật formData khi nhập
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  // 🔹 Gửi yêu cầu cập nhật profile
   const handleUpdate = async () => {
     try {
       const payload = {
@@ -100,7 +101,6 @@ export default function ProfilePage() {
 
       if (res.data.success) {
         setProfile(res.data.data)
-        setIsEditing(false)
         toast({ title: "✅ Cập nhật thành công!" })
       }
     } catch (err) {
@@ -109,10 +109,8 @@ export default function ProfilePage() {
     }
   }
 
-  // 🔹 Xóa tài khoản
   const handleDelete = async () => {
     const userId = localStorage.getItem("userId")
-
     if (!confirm("Bạn có chắc muốn xóa tài khoản này không?")) return
     try {
       await api.delete(`/users/${userId}`, {
@@ -141,69 +139,87 @@ export default function ProfilePage() {
       : "Chưa cập nhật"
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="space-y-6 p-6">
       {/* Header */}
-      <section className="py-10 bg-white/70 backdrop-blur-sm">
-        <div className="container mx-auto px-4 text-center space-y-3">
-          <h1 className="text-4xl font-bold flex items-center justify-center gap-3">
-            <Sparkles className="w-9 h-9 text-primary" />
-            Hồ Sơ Cá Nhân
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Quản lý và cập nhật thông tin cá nhân của bạn.
-          </p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <Sparkles className="w-6 h-6 text-primary" />
+          <div>
+            <h1 className="text-3xl font-bold">Hồ sơ cá nhân</h1>
+            <p className="text-muted-foreground">Xem và chỉnh sửa thông tin của bạn</p>
+          </div>
         </div>
-      </section>
+        <Button
+          onClick={handleUpdate}
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
+        >
+          <Save className="h-4 w-4 mr-2" />
+          Lưu thay đổi
+        </Button>
+      </div>
 
-      {/* Nội dung */}
-      <div className="container mx-auto px-4 py-12 space-y-8">
-        
-
-        <Card className="max-w-4xl mx-auto bg-white/70 backdrop-blur-md shadow-md border border-gray-200 rounded-2xl">
-          <CardHeader className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-t-2xl">
-            <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-              <User className="w-5 h-5" /> {profile.fullName || "Người dùng"}
-            </CardTitle>
-          </CardHeader>
-
-          <CardContent className="p-6 space-y-6">
-            {!isEditing ? (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
-                  <p className="flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-indigo-500" />
-                    <span><strong>Email:</strong> {profile.email}</span>
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-indigo-500" />
-                    <span><strong>Điện thoại:</strong> {profile.phone || "Chưa cập nhật"}</span>
-                  </p>
-                  <p><strong>Giới tính:</strong> <Badge variant="secondary">{profile.gender || "Chưa cập nhật"}</Badge></p>
-                  <p><strong>Chiều cao:</strong> {profile.height || "Chưa cập nhật"} cm</p>
-                  <p><strong>Cân nặng:</strong> {profile.weight || "Chưa cập nhật"} kg</p>
-                  <p><strong>Ngày sinh:</strong> {profile.birthDate ? new Date(profile.birthDate).toLocaleDateString("vi-VN") : "Chưa cập nhật"}</p>
-                  <p><strong>Kiểu da:</strong> {profile.skinTone || "Chưa cập nhật"}</p>
-                  <p><strong>Dáng người:</strong> {profile.bodyType || "Chưa cập nhật"}</p>
-                  <p><strong>Phong cách:</strong> {profile.stylePreferences || "Chưa cập nhật"}</p>
-                  <p><strong>Kích cỡ ưa thích:</strong> {profile.sizePreferences || "Chưa cập nhật"}</p>
-                  <p><strong>Ngày tạo:</strong> {createdDate}</p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Thông tin bên trái */}
+        <div className="lg:col-span-1">
+          <Card className="bg-card border-border">
+            <CardHeader className="text-center">
+              <div className="mx-auto h-24 w-24 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-2xl font-bold mb-4">
+                {profile.fullName?.charAt(0)}
+              </div>
+              <CardTitle>{profile.fullName || "Người dùng"}</CardTitle>
+              {/* <CardDescription className="text-muted-foreground">
+                ID: {profile.id}
+              </CardDescription> */}
+              <div className="flex justify-center space-x-2 mt-4">
+                <Badge variant="secondary">
+                  {profile.gender || "Chưa cập nhật"}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <span>{profile.email}</span>
                 </div>
-
-                <div className="flex gap-3 pt-6">
-                  <Button variant="gentry" onClick={() => setIsEditing(true)}>
-                    <Edit className="w-4 h-4 mr-2" /> Chỉnh sửa
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="bg-red-500 hover:bg-red-600"
-                    onClick={handleDelete}
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" /> Xóa tài khoản
-                  </Button>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-muted-foreground" />
+                  <span>{profile.phone || "Chưa cập nhật"}</span>
                 </div>
-              </>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span>Ngày tạo: {createdDate}</span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-3 mt-6">
+                <Button
+                  variant="destructive"
+                  className="bg-red-500 hover:bg-red-600"
+                  onClick={handleDelete}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" /> Xóa tài khoản
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={logout}
+                  className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                >
+                  <LogOut className="w-4 h-4 mr-2" /> Đăng xuất
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Form chỉnh sửa */}
+        <div className="lg:col-span-2">
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle>Thông tin cá nhân</CardTitle>
+              <CardDescription>Cập nhật chi tiết hồ sơ</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <Label>Họ</Label>
                   <Input name="firstName" value={formData.firstName || ""} onChange={handleChange} />
@@ -220,6 +236,9 @@ export default function ProfilePage() {
                   <Label>Số điện thoại</Label>
                   <Input name="phone" value={formData.phone || ""} onChange={handleChange} />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <Label>Giới tính</Label>
                   <Input name="gender" value={formData.gender || ""} onChange={handleChange} />
@@ -241,6 +260,9 @@ export default function ProfilePage() {
                   <Label>Cân nặng (kg)</Label>
                   <Input name="weight" value={formData.weight || ""} onChange={handleChange} />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <Label>Màu da</Label>
                   <Input name="skinTone" value={formData.skinTone || ""} onChange={handleChange} />
@@ -251,33 +273,34 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <Label>Phong cách</Label>
-                  <Input name="stylePreferences" value={formData.stylePreferences || ""} onChange={handleChange} />
+                  <Input
+                    name="stylePreferences"
+                    value={formData.stylePreferences || ""}
+                    onChange={handleChange}
+                  />
                 </div>
                 <div>
                   <Label>Kích cỡ ưa thích</Label>
-                  <Input name="sizePreferences" value={formData.sizePreferences || ""} onChange={handleChange} />
-                </div>
-
-                <div className="flex gap-3 pt-4 col-span-2">
-                  <Button variant="gentry" onClick={handleUpdate}>
-                    <Save className="w-4 h-4 mr-2" /> Lưu thay đổi
-                  </Button>
-                  <Button variant="outline" onClick={() => setIsEditing(false)}>
-                    <X className="w-4 h-4 mr-2" /> Hủy
-                  </Button>
+                  <Input
+                    name="sizePreferences"
+                    value={formData.sizePreferences || ""}
+                    onChange={handleChange}
+                  />
                 </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
-        <div className="flex justify-end">
-          <Button
-            variant="outline"
-            onClick={logout}
-            className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-          >
-            <LogOut className="w-4 h-4 mr-2" /> Đăng xuất
-          </Button>
+
+              <div>
+                <Label>Giới thiệu</Label>
+                <Textarea
+                  name="bio"
+                  value={formData.stylePreferences || ""}
+                  onChange={handleChange}
+                  rows={3}
+                  placeholder="Mô tả ngắn về bản thân..."
+                />
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

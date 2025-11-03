@@ -1,123 +1,94 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Search, Filter, Plus, Edit, Trash2, Eye, MoreHorizontal, Tag, DollarSign } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  Search,
+  Filter,
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  Tag,
+  DollarSign,
+} from "lucide-react"
+import { useRouter } from "next/navigation"
+import api from "@/app/config/api"
 
-const fashionItems = [
-  {
-    id: 1,
-    name: "Áo sơ mi trắng basic",
-    category: "Áo sơ mi",
-    brand: "ZARA",
-    price: "599,000",
-    color: "Trắng",
-    size: ["S", "M", "L", "XL"],
-    status: "active",
-    stock: 45,
-    sold: 123,
-    rating: 4.5,
-    image: "/white-shirt.png",
-    createdDate: "2024-01-15",
-  },
-  {
-    id: 2,
-    name: "Quần jeans skinny đen",
-    category: "Quần jeans",
-    brand: "H&M",
-    price: "799,000",
-    color: "Đen",
-    size: ["28", "29", "30", "31", "32"],
-    status: "active",
-    stock: 32,
-    sold: 89,
-    rating: 4.2,
-    image: "/black-jeans.png",
-    createdDate: "2024-01-20",
-  },
-  {
-    id: 3,
-    name: "Váy midi hoa nhí",
-    category: "Váy",
-    brand: "MANGO",
-    price: "1,299,000",
-    color: "Hoa văn",
-    size: ["S", "M", "L"],
-    status: "inactive",
-    stock: 0,
-    sold: 67,
-    rating: 4.8,
-    image: "/floral-midi-dress.png",
-    createdDate: "2024-02-05",
-  },
-  {
-    id: 4,
-    name: "Áo khoác blazer navy",
-    category: "Áo khoác",
-    brand: "UNIQLO",
-    price: "1,599,000",
-    color: "Navy",
-    size: ["S", "M", "L", "XL"],
-    status: "active",
-    stock: 18,
-    sold: 45,
-    rating: 4.6,
-    image: "/navy-blazer.png",
-    createdDate: "2024-02-10",
-  },
-  {
-    id: 5,
-    name: "Giày sneaker trắng",
-    category: "Giày",
-    brand: "ADIDAS",
-    price: "2,199,000",
-    color: "Trắng",
-    size: ["36", "37", "38", "39", "40", "41", "42"],
-    status: "active",
-    stock: 25,
-    sold: 156,
-    rating: 4.7,
-    image: "/white-sneakers.png",
-    createdDate: "2024-02-15",
-  },
-]
-
-const statusColors = {
-  active: "bg-green-100 text-green-800 border-green-200",
-  inactive: "bg-red-100 text-red-800 border-red-200",
-  draft: "bg-yellow-100 text-yellow-800 border-yellow-200",
+interface Item {
+  id: string
+  name: string
+  brand: string
+  categoryId: number
+  categoryName: string
+  fileId: number
+  fileUrl: string
+  colorName: string
+  colorHex: string
+  tags: string
+  price: string | null
+  createdDate: string
 }
 
-export default function FashionItems() {
+export default function FashionItemsPage() {
+  const [items, setItems] = useState<Item[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
-  const [selectedStatus, setSelectedStatus] = useState("all")
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
-  const filteredItems = fashionItems.filter((item) => {
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const res = await api.get("/items")
+        if (res.data.success && res.data.data) {
+          setItems(res.data.data)
+        }
+      } catch (err) {
+        console.error("Lỗi khi tải items:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchItems()
+  }, [])
+
+  const filteredItems = items.filter((item) => {
     const matchesSearch =
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.brand.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = selectedCategory === "all" || item.category === selectedCategory
-    const matchesStatus = selectedStatus === "all" || item.status === selectedStatus
-
-    return matchesSearch && matchesCategory && matchesStatus
+      item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.brand?.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCategory =
+      selectedCategory === "all" || item.categoryName === selectedCategory
+    return matchesSearch && matchesCategory
   })
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[80vh] text-muted-foreground">
+        Đang tải dữ liệu...
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Quản lý Items thời trang</h1>
-          <p className="text-muted-foreground mt-2">Quản lý sản phẩm thời trang trong hệ thống</p>
+          <h1 className="text-3xl font-bold text-foreground">Quản lý sản phẩm</h1>
+          <p className="text-muted-foreground mt-2">
+            Danh sách sản phẩm được đồng bộ từ hệ thống
+          </p>
         </div>
-        <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+        <Button
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
+          onClick={() => router.push("/items/add")}
+        >
           <Plus className="h-4 w-4 mr-2" />
-          Thêm item mới
+          Thêm sản phẩm
         </Button>
       </div>
 
@@ -127,8 +98,8 @@ export default function FashionItems() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Tổng items</p>
-                <p className="text-2xl font-bold text-foreground">3,421</p>
+                <p className="text-sm text-muted-foreground">Tổng sản phẩm</p>
+                <p className="text-2xl font-bold text-foreground">{items.length}</p>
               </div>
               <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <Tag className="h-6 w-6 text-blue-600" />
@@ -141,8 +112,10 @@ export default function FashionItems() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Đang bán</p>
-                <p className="text-2xl font-bold text-green-600">2,847</p>
+                <p className="text-sm text-muted-foreground">Danh mục</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {new Set(items.map((i) => i.categoryName)).size}
+                </p>
               </div>
               <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
                 <div className="h-3 w-3 bg-green-500 rounded-full"></div>
@@ -155,8 +128,10 @@ export default function FashionItems() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Hết hàng</p>
-                <p className="text-2xl font-bold text-red-600">234</p>
+                <p className="text-sm text-muted-foreground">Màu sắc</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {new Set(items.map((i) => i.colorName)).size}
+                </p>
               </div>
               <div className="h-12 w-12 bg-red-100 rounded-lg flex items-center justify-center">
                 <div className="h-3 w-3 bg-red-500 rounded-full"></div>
@@ -169,7 +144,7 @@ export default function FashionItems() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Doanh thu tháng</p>
+                <p className="text-sm text-muted-foreground">Doanh thu (giả lập)</p>
                 <p className="text-2xl font-bold text-purple-600">₫2.4M</p>
               </div>
               <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -180,21 +155,23 @@ export default function FashionItems() {
         </Card>
       </div>
 
-      {/* Filters and Search */}
+      {/* Filters */}
       <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-foreground">Danh sách items</CardTitle>
-          <CardDescription className="text-muted-foreground">
+          <CardTitle>Danh sách sản phẩm</CardTitle>
+          <CardDescription>
             Tìm kiếm và quản lý các sản phẩm thời trang
           </CardDescription>
         </CardHeader>
+
         <CardContent>
+          {/* Bộ lọc */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Tìm kiếm theo tên hoặc thương hiệu..."
+                  placeholder="Tìm theo tên hoặc thương hiệu..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -208,22 +185,11 @@ export default function FashionItems() {
               className="px-3 py-2 border border-border rounded-md bg-background text-foreground"
             >
               <option value="all">Tất cả danh mục</option>
-              <option value="Áo sơ mi">Áo sơ mi</option>
-              <option value="Quần jeans">Quần jeans</option>
-              <option value="Váy">Váy</option>
-              <option value="Áo khoác">Áo khoác</option>
-              <option value="Giày">Giày</option>
-            </select>
-
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2 border border-border rounded-md bg-background text-foreground"
-            >
-              <option value="all">Tất cả trạng thái</option>
-              <option value="active">Đang bán</option>
-              <option value="inactive">Ngừng bán</option>
-              <option value="draft">Bản nháp</option>
+              {[...new Set(items.map((i) => i.categoryName))].map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
             </select>
 
             <Button variant="outline">
@@ -232,82 +198,83 @@ export default function FashionItems() {
             </Button>
           </div>
 
-          {/* Items Grid */}
+          {/* Danh sách sản phẩm */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredItems.map((item) => (
-              <Card key={item.id} className="bg-card border-border hover:shadow-lg transition-shadow">
-                <CardContent className="p-4">
-                  <div className="aspect-square bg-muted rounded-lg mb-4 overflow-hidden">
-                    <img
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-start justify-between">
-                      <h3 className="font-medium text-foreground text-sm line-clamp-2">{item.name}</h3>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Eye className="h-4 w-4 mr-2" />
-                            Xem chi tiết
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Chỉnh sửa
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Xóa
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+            {filteredItems.length > 0 ? (
+              filteredItems.map((item) => (
+                <Card
+                  key={item.id}
+                  className="bg-card border-border hover:shadow-lg transition-shadow"
+                >
+                  <CardContent className="p-4">
+                    <div className="aspect-square bg-muted rounded-lg mb-4 overflow-hidden">
+                      <img
+                        src={item.fileUrl || "/placeholder.svg"}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
 
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">{item.brand}</span>
-                      <Badge className={statusColors[item.status as keyof typeof statusColors]}>
-                        {item.status === "active" ? "Đang bán" : item.status === "inactive" ? "Ngừng bán" : "Bản nháp"}
-                      </Badge>
-                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-foreground text-sm line-clamp-2">
+                        {item.name}
+                      </h3>
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <span>{item.brand}</span>
+                        <Badge
+                          className="border border-gray-200"
+                          style={{
+                            backgroundColor: item.colorHex,
+                            color: "#000",
+                          }}
+                        >
+                          {item.colorName}
+                        </Badge>
+                      </div>
 
-                    <div className="text-sm text-muted-foreground">
-                      <p>Danh mục: {item.category}</p>
-                      <p>Màu: {item.color}</p>
-                    </div>
+                      <p className="text-sm text-muted-foreground">
+                        Danh mục: {item.categoryName}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-foreground">
+                          ₫{item.price || "—"}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(item.createdDate).toLocaleDateString("vi-VN")}
+                        </span>
+                      </div>
 
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-foreground">₫{item.price}</span>
-                      <div className="text-xs text-muted-foreground">
-                        <span>Kho: {item.stock}</span>
-                        <span className="ml-2">Đã bán: {item.sold}</span>
+                      <div className="flex items-center justify-between mt-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => router.push(`/items/${item.id}`)}
+                        >
+                          <Eye className="h-4 w-4 mr-1" /> Xem
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => router.push(`/items/edit/${item.id}`)}
+                        >
+                          <Edit className="h-4 w-4 mr-1" /> Sửa
+                        </Button>
                       </div>
                     </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-1">
-                        <span className="text-yellow-500">★</span>
-                        <span className="text-sm text-foreground">{item.rating}</span>
-                      </div>
-                      <span className="text-xs text-muted-foreground">{item.createdDate}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="text-center text-muted-foreground col-span-full py-10">
+                Không tìm thấy sản phẩm nào.
+              </div>
+            )}
           </div>
 
-          {/* Pagination */}
+          {/* Pagination giả */}
           <div className="flex items-center justify-between mt-6">
             <p className="text-sm text-muted-foreground">
-              Hiển thị {filteredItems.length} trong tổng số {fashionItems.length} items
+              Hiển thị {filteredItems.length}/{items.length} sản phẩm
             </p>
             <div className="flex items-center space-x-2">
               <Button variant="outline" size="sm" disabled>
@@ -318,9 +285,6 @@ export default function FashionItems() {
               </Button>
               <Button variant="outline" size="sm">
                 2
-              </Button>
-              <Button variant="outline" size="sm">
-                3
               </Button>
               <Button variant="outline" size="sm">
                 Sau
