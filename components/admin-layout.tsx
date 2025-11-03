@@ -6,6 +6,9 @@ import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { Users, Shirt, MessageSquare, BarChart3, Settings, Menu, X, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
+import { useAuth } from "./AuthContext"
+import { LogOut } from "lucide-react"
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -22,7 +25,7 @@ const navigation = [
     icon: Users,
     children: [
       { name: "Danh sách người dùng", href: "/users" },
-      { name: "Chi tiết/Chỉnh sửa", href: "/users/edit" },
+      // { name: "Chi tiết/Chỉnh sửa", href: "/users/edit" },
     ],
   },
   {
@@ -31,32 +34,34 @@ const navigation = [
     children: [
       { name: "Items", href: "/fashion/items" },
       { name: "Danh mục", href: "/fashion/categories" },
-      { name: "Dataset ảnh", href: "/fashion/images" },
+      // { name: "Dataset ảnh", href: "/fashion/images" },
     ],
   },
-  {
-    name: "Quản lý cộng đồng",
-    icon: MessageSquare,
-    children: [
-      { name: "Outfit", href: "/community/outfits" },
-      { name: "Bình luận", href: "/community/comments" },
-      { name: "Báo cáo", href: "/community/reports" },
-    ],
-  },
-  {
-    name: "Báo cáo & Thống kê",
-    icon: BarChart3,
-    children: [
-      { name: "Dashboard", href: "/analytics" },
-      { name: "Báo cáo chi tiết", href: "/analytics/reports" },
-    ],
-  },
+  // {
+  //   name: "Quản lý cộng đồng",
+  //   icon: MessageSquare,
+  //   children: [
+  //     { name: "Outfit", href: "/community/outfits" },
+  //     { name: "Bình luận", href: "/community/comments" },
+  //     { name: "Báo cáo", href: "/community/reports" },
+  //   ],
+  // },
+  // {
+  //   name: "Báo cáo & Thống kê",
+  //   icon: BarChart3,
+  //   children: [
+  //     { name: "Dashboard", href: "/analytics" },
+  //     { name: "Báo cáo chi tiết", href: "/analytics/reports" },
+  //   ],
+  // },
 ]
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [expandedItems, setExpandedItems] = useState<string[]>(["Dashboard"])
   const pathname = usePathname()
+  const { logout } = useAuth();
 
   const toggleExpanded = (itemName: string) => {
     setExpandedItems((prev) =>
@@ -66,6 +71,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const isCurrentPath = (href: string) => {
     return pathname === href
+  }
+
+  const handleLogout = () => {
+    logout()
+    router.push("/login")
   }
 
   return (
@@ -134,9 +144,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </nav>
 
         <div className="border-t border-border p-4">
-          <Button variant="ghost" className="w-full justify-start">
-            <Settings className="mr-3 h-5 w-5" />
-            Cài đặt
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-red-600 hover:text-red-700"
+            onClick={handleLogout}
+          >
+            <LogOut className="mr-3 h-5 w-5" />
+            Đăng xuất
           </Button>
         </div>
       </div>

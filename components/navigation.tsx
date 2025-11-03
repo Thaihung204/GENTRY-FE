@@ -66,7 +66,7 @@ export function Navigation() {
                   </Link>
                 </Button>
 
-                <Button
+                {/* <Button
                   variant="outline"
                   size="sm"
                   onClick={async () => {
@@ -75,7 +75,7 @@ export function Navigation() {
                   }}
                 >
                   Đăng xuất
-                </Button>
+                </Button> */}
               </div>
             ) : (
               <Button asChild className="btn-gentry">
