@@ -5,17 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import {
-  Search,
-  Filter,
-  Plus,
-  Edit,
-  Trash2,
-  Eye,
-  Tag,
-  DollarSign,
-} from "lucide-react"
-import { useRouter } from "next/navigation"
+import { Search, Filter, Plus, Eye, Tag } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import api from "@/app/config/api"
 
 interface Item {
@@ -35,20 +26,23 @@ interface Item {
 
 export default function FashionItemsPage() {
   const [items, setItems] = useState<Item[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
-  const [loading, setLoading] = useState(true)
-  const router = useRouter()
+
+  // 🔍 Popup chi tiết
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const res = await api.get("/items")
-        if (res.data.success && res.data.data) {
+        const res = await api.get("/items/all")
+        if (res.data.success && Array.isArray(res.data.data)) {
           setItems(res.data.data)
         }
-      } catch (err) {
-        console.error("Lỗi khi tải items:", err)
+      } catch (error) {
+        console.error("❌ Lỗi khi lấy danh sách items:", error)
       } finally {
         setLoading(false)
       }
@@ -57,12 +51,11 @@ export default function FashionItemsPage() {
   }, [])
 
   const filteredItems = items.filter((item) => {
-    const matchesSearch =
-      item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.brand?.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory =
-      selectedCategory === "all" || item.categoryName === selectedCategory
-    return matchesSearch && matchesCategory
+    const matchSearch =
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.brand.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchCategory = selectedCategory === "all" || item.categoryName === selectedCategory
+    return matchSearch && matchCategory
   })
 
   if (loading) {
@@ -80,219 +73,186 @@ export default function FashionItemsPage() {
         <div>
           <h1 className="text-3xl font-bold text-foreground">Quản lý sản phẩm</h1>
           <p className="text-muted-foreground mt-2">
-            Danh sách sản phẩm được đồng bộ từ hệ thống
+            Quản lý danh sách sản phẩm thời trang được đồng bộ từ hệ thống
           </p>
         </div>
-        <Button
-          className="bg-primary text-primary-foreground hover:bg-primary/90"
-          onClick={() => router.push("/items/add")}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Thêm sản phẩm
+        <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Plus className="h-4 w-4 mr-2" /> Thêm sản phẩm
         </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="bg-card border-border">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Tổng sản phẩm</p>
-                <p className="text-2xl font-bold text-foreground">{items.length}</p>
-              </div>
-              <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Tag className="h-6 w-6 text-blue-600" />
-              </div>
+      {/* Thống kê */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardContent className="p-6 flex justify-between items-center">
+            <div>
+              <p className="text-sm text-muted-foreground">Tổng sản phẩm</p>
+              <p className="text-2xl font-bold">{items.length}</p>
             </div>
+            <Tag className="h-8 w-8 text-blue-600" />
           </CardContent>
         </Card>
-
-        <Card className="bg-card border-border">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Danh mục</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {new Set(items.map((i) => i.categoryName)).size}
-                </p>
-              </div>
-              <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <div className="h-3 w-3 bg-green-500 rounded-full"></div>
-              </div>
+        <Card>
+          <CardContent className="p-6 flex justify-between items-center">
+            <div>
+              <p className="text-sm text-muted-foreground">Số danh mục</p>
+              <p className="text-2xl font-bold text-green-600">
+                {new Set(items.map((i) => i.categoryName)).size}
+              </p>
             </div>
+            <div className="h-3 w-3 bg-green-500 rounded-full"></div>
           </CardContent>
         </Card>
-
-        <Card className="bg-card border-border">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Màu sắc</p>
-                <p className="text-2xl font-bold text-red-600">
-                  {new Set(items.map((i) => i.colorName)).size}
-                </p>
-              </div>
-              <div className="h-12 w-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <div className="h-3 w-3 bg-red-500 rounded-full"></div>
-              </div>
+        <Card>
+          <CardContent className="p-6 flex justify-between items-center">
+            <div>
+              <p className="text-sm text-muted-foreground">Số màu sắc</p>
+              <p className="text-2xl font-bold text-red-600">
+                {new Set(items.map((i) => i.colorName)).size}
+              </p>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card border-border">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Doanh thu (giả lập)</p>
-                <p className="text-2xl font-bold text-purple-600">₫2.4M</p>
-              </div>
-              <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="h-6 w-6 text-purple-600" />
-              </div>
-            </div>
+            <div className="h-3 w-3 bg-red-500 rounded-full"></div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters */}
-      <Card className="bg-card border-border">
+      {/* Danh sách sản phẩm */}
+      <Card>
         <CardHeader>
           <CardTitle>Danh sách sản phẩm</CardTitle>
-          <CardDescription>
-            Tìm kiếm và quản lý các sản phẩm thời trang
-          </CardDescription>
+          <CardDescription>Tìm kiếm, lọc và xem chi tiết sản phẩm</CardDescription>
         </CardHeader>
-
         <CardContent>
           {/* Bộ lọc */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Tìm theo tên hoặc thương hiệu..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Tìm theo tên hoặc thương hiệu..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
 
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 border border-border rounded-md bg-background text-foreground"
+              className="border rounded-md px-3 py-2 bg-background"
             >
               <option value="all">Tất cả danh mục</option>
               {[...new Set(items.map((i) => i.categoryName))].map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
+                <option key={cat}>{cat}</option>
               ))}
             </select>
 
             <Button variant="outline">
-              <Filter className="h-4 w-4 mr-2" />
-              Lọc
+              <Filter className="h-4 w-4 mr-2" /> Lọc
             </Button>
           </div>
 
-          {/* Danh sách sản phẩm */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {/* Cards sản phẩm */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredItems.length > 0 ? (
               filteredItems.map((item) => (
                 <Card
                   key={item.id}
-                  className="bg-card border-border hover:shadow-lg transition-shadow"
+                  className="hover:shadow-lg transition-all border border-border bg-card cursor-pointer"
+                  onClick={() => {
+                    setSelectedItem(item)
+                    setDetailOpen(true)
+                  }}
                 >
-                  <CardContent className="p-4">
-                    <div className="aspect-square bg-muted rounded-lg mb-4 overflow-hidden">
+                  <CardContent className="p-4 space-y-3">
+                    <div className="aspect-square overflow-hidden rounded-lg bg-muted">
                       <img
                         src={item.fileUrl || "/placeholder.svg"}
                         alt={item.name}
-                        className="w-full h-full object-cover"
+                        className="object-cover w-full h-full"
                       />
                     </div>
-
-                    <div className="space-y-2">
-                      <h3 className="font-semibold text-foreground text-sm line-clamp-2">
-                        {item.name}
-                      </h3>
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>{item.brand}</span>
-                        <Badge
-                          className="border border-gray-200"
-                          style={{
-                            backgroundColor: item.colorHex,
-                            color: "#000",
-                          }}
-                        >
-                          {item.colorName}
-                        </Badge>
-                      </div>
-
-                      <p className="text-sm text-muted-foreground">
-                        Danh mục: {item.categoryName}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-foreground">
-                          ₫{item.price || "—"}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(item.createdDate).toLocaleDateString("vi-VN")}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between mt-3">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => router.push(`/items/${item.id}`)}
-                        >
-                          <Eye className="h-4 w-4 mr-1" /> Xem
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => router.push(`/items/edit/${item.id}`)}
-                        >
-                          <Edit className="h-4 w-4 mr-1" /> Sửa
-                        </Button>
-                      </div>
+                    <div>
+                      <h3 className="font-semibold text-sm line-clamp-2">{item.name}</h3>
+                      <p className="text-xs text-muted-foreground">{item.brand}</p>
                     </div>
+
+                    <div className="flex items-center justify-between text-xs">
+                      <Badge
+                        variant="outline"
+                        className="flex items-center gap-1 border"
+                        style={{ backgroundColor: item.colorHex }}
+                      >
+                        {item.colorName}
+                      </Badge>
+                      <span className="italic text-muted-foreground">{item.tags}</span>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground">
+                      Danh mục: {item.categoryName}
+                    </p>
+
+                    <div className="flex items-center justify-between text-xs">
+                      {/* <span className="text-foreground font-bold">
+                        {item.price ? `₫${item.price}` : "—"}
+                      </span> */}
+                      <span className="text-muted-foreground">
+                        {new Date(item.createdDate).toLocaleDateString("vi-VN")}
+                      </span>
+                    </div>
+
+                    {/* <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full mt-2"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setSelectedItem(item)
+                        setDetailOpen(true)
+                      }}
+                    >
+                      <Eye className="h-4 w-4 mr-1" /> Xem
+                    </Button> */}
                   </CardContent>
                 </Card>
               ))
             ) : (
-              <div className="text-center text-muted-foreground col-span-full py-10">
+              <p className="col-span-full text-center text-muted-foreground py-10">
                 Không tìm thấy sản phẩm nào.
-              </div>
+              </p>
             )}
-          </div>
-
-          {/* Pagination giả */}
-          <div className="flex items-center justify-between mt-6">
-            <p className="text-sm text-muted-foreground">
-              Hiển thị {filteredItems.length}/{items.length} sản phẩm
-            </p>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" disabled>
-                Trước
-              </Button>
-              <Button variant="outline" size="sm" className="bg-primary text-primary-foreground">
-                1
-              </Button>
-              <Button variant="outline" size="sm">
-                2
-              </Button>
-              <Button variant="outline" size="sm">
-                Sau
-              </Button>
-            </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* 🔍 Popup xem chi tiết sản phẩm */}
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+        <DialogContent className="max-w-xl">
+          {selectedItem && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Eye className="w-5 h-5" /> {selectedItem.name}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="flex flex-col md:flex-row gap-6">
+                <img
+                  src={selectedItem.fileUrl || "/placeholder.svg"}
+                  alt={selectedItem.name}
+                  className="w-64 h-64 object-cover rounded"
+                />
+                <div className="space-y-3 text-sm">
+                  <p><strong>Thương hiệu:</strong> {selectedItem.brand || "—"}</p>
+                  <p><strong>Danh mục:</strong> {selectedItem.categoryName || "—"}</p>
+                  <p><strong>Màu sắc:</strong> {selectedItem.colorName || "—"}</p>
+                  <p><strong>Tags:</strong> {selectedItem.tags || "—"}</p>
+                  {/* <p><strong>Giá:</strong> {selectedItem.price ? `₫${selectedItem.price}` : "—"}</p> */}
+                  <p><strong>Ngày tạo:</strong> {new Date(selectedItem.createdDate).toLocaleDateString("vi-VN")}</p>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
